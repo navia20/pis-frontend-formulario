@@ -1,0 +1,25 @@
+.logo-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Ajusta según el diseño */
+  padding: 10px;
+}
+
+.logo {
+  background-size: cover;
+  background-position: center;
+}
+
+.logo-left {
+  width: 100px; /* Tamaño del logo circular */
+  height: 100px;
+  border-radius: 50%; /* Hace que el logo sea circular */
+  background-image: url('../../assets/images/LogoUCN.png'); /* Logo izquierdo */
+}
+
+.logo-right {
+  width: 182px; /* Ancho del logo rectangular */
+  height: 80px; /* Alto del logo rectangular */
+  background-image: url('../../assets/images/LogoEIC.png'); /* Logo derecho */
+}

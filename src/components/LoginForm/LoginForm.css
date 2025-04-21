@@ -1,0 +1,134 @@
+/* Asegura que el fondo cubra toda la pantalla */
+/* Asegura que el fondo cubra toda la pantalla */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Asegura que el fondo ocupe toda la pantalla */
+    width: 100%; /* Asegura que el ancho también sea del 100% */
+    font-family: Arial, sans-serif;
+    overflow: hidden; /* Evita barras de desplazamiento */
+  }
+  
+  /* Aplica el fondo al body */
+  body {
+    background-image: url('../../assets/images/background.jpg'); /* Ruta de la imagen */
+    background-size: cover; /* Escala la imagen para cubrir toda la pantalla */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Asegura que el fondo cubra toda la altura de la ventana */
+    min-width: 100vw; /* Asegura que el fondo cubra todo el ancho de la ventana */
+  }
+  
+  /* Estilo del contenedor del formulario */
+  .login-container {
+    background-color: rgba(44, 53, 80, 0.9); /* Fondo semitransparente */
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+    text-align: center;
+    margin: px; /* Elimina márgenes adicionales */
+    display: block;
+  }
+
+.logo {
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 1.3rem; /* Reduce el tamaño del título */
+  margin-bottom: 10px; /* Ajusta el margen inferior */
+    font-weight: bold; /* Aumenta el grosor del texto */
+}
+
+h2 {
+  font-size: 1rem; /* Reduce el tamaño del subtítulo */
+  margin-bottom: 20px; /* Ajusta el margen inferior */
+  
+}
+
+.form-group {
+  margin-bottom: 15px; /* Reduce el margen entre los campos */
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px; /* Reduce el margen inferior */
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 95%;
+  padding: 10px; /* Reduce el padding */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.9rem; /* Reduce el tamaño del texto */
+  transition: border 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.forgot-password {
+  display: block;
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot-password a {
+  color: #3498db;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.btn {
+  background-color: #3498db;
+  border: none;
+  padding: 10px 15px; /* Reduce el padding */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem; /* Reduce el tamaño del texto */
+  width: 40%;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #2980b9;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Reduce el margen inferior */
+}
+
+.checkbox-container input {
+  margin-right: 8px; /* Reduce el espacio entre el checkbox y el texto */
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-bottom: 10px; /* Reduce el margen inferior */
+  font-size: 0.8rem; /* Reduce el tamaño del texto */
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 15px; /* Reduce el padding en pantallas pequeñas */
+    margin: 0 10px; /* Ajusta el margen lateral */
+  }
+}
+
