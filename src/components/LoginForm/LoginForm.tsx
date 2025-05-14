@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { Logo } from '../Logo';
 import './LoginForm.css';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
+// Datos de prueba
+const usuarios = [
+  { rut: '12345678K', password: 'admin123', rol: 'admin' },
+  { rut: '87654321K', password: 'estudiante123', rol: 'estudiante' },
+  { rut: '11223344K', password: 'docente123', rol: 'docente' },
+];
 
 export const LoginForm: React.FC = () => {
   const [rut, setRut] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Inicializa useNavigate
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,9 +26,26 @@ export const LoginForm: React.FC = () => {
       return;
     }
     
-    setError('');
-    console.log('Iniciando sesión con:', { rut, password, rememberMe });
-    // Aquí iría la llamada a la API para autenticar
+    // Buscar usuario en los datos de prueba
+    const usuario = usuarios.find(
+    (user) => user.rut.toLowerCase() === rut.toLowerCase() && user.password === password
+  );
+
+  console.log('Usuario encontrado:', usuario);
+
+  if (!usuario) {
+    setError('Credenciales incorrectas. Por favor, inténtelo de nuevo.');
+    return;
+  }
+
+  if (usuario.rol === 'admin') {
+    navigate('/admin'); // Redirige a la página de admin
+  } else if (usuario.rol === 'estudiante') {
+    navigate('/estudiante'); // Redirige a la página de estudiante
+  } else if (usuario.rol === 'docente') {
+    navigate('/docente'); // Redirige a la página de docente
+  }
+  
   };
 
   return (

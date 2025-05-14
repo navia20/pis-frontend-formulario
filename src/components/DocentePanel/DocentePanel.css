@@ -1,0 +1,104 @@
+/* Contenedor principal */
+.docente-panel {
+  display: flex;
+  height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
+  width: 100vw; /* Asegura que ocupe todo el ancho de la ventana */
+  margin: 0; /* Elimina márgenes */
+  padding: 0; /* Elimina padding */
+}
+
+/* Barra lateral */
+.docente-sidebar {
+  width: 300px; /* Ancho de la barra lateral */
+  background-image: url('../../assets/images/celeste.jpg'); /* Fondo de la imagen */
+  background-size: cover; /* Escala la imagen para cubrir toda la barra */
+  background-position: center; /* Centra la imagen */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  height: 100vh; /* Asegura que la barra lateral cubra toda la altura */
+  position: fixed; /* Fija la barra lateral al margen izquierdo */
+  left: 0; /* Asegura que esté alineada al margen izquierdo */
+  top: 0; /* Asegura que comience desde la parte superior */
+}
+
+/* Contenedor del logo */
+.docente-logo-container {
+  display: flex;
+  justify-content: space-between; /* Coloca los logos uno al lado del otro */
+  align-items: center;
+  width: 100%; /* Asegura que ocupe todo el ancho de la barra lateral */
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.docente-logo {
+  background-size: cover;
+  background-position: center;
+}
+
+.docente-logo-left {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Hace que el logo sea circular */
+  background-image: url('../../assets/images/LogoUCN.png');
+}
+
+.docente-logo-right {
+  width: 182px;
+  height: 80px;
+  background-image: url('../../assets/images/LogoEIC.png');
+}
+
+/* Menú */
+.docente-menu {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+.docente-menu li {
+  display: flex;
+  align-items: center; /* Alinea el ícono y el texto verticalmente */
+  padding: 15px 20px;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.3s;
+}
+
+.docente-menu li:hover {
+  background-color: #2980b9;
+}
+
+.docente-menu-icon {
+  margin-right: 10px; /* Espacio entre el ícono y el texto */
+  font-size: 1.5rem; /* Tamaño del ícono */
+  color: white; /* Color del ícono */
+}
+
+/* Botón de cerrar sesión */
+.docente-logout {
+  margin-top: auto;
+  border-top: 1px solid white;
+  padding-top: 15px;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.docente-logout:hover {
+  background-color: #c0392b;
+}
+
+/* Contenedor de contenido */
+.docente-content {
+  margin-left: 300px; /* Deja espacio para la barra lateral */
+  flex: 1; /* Hace que el contenido ocupe todo el espacio restante */
+  padding: 20px;
+  background-color: #f4f4f9; /* Fondo blanco */
+  height: 100vh; /* Asegura que cubra toda la altura */
+  overflow-y: auto; /* Permite desplazamiento si el contenido es muy largo */
+}

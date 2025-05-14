@@ -8,9 +8,30 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import EditSquareIcon from '@mui/icons-material/Edit';
 import { CrearFormulario } from './CrearFormulario/CrearFormulario';
+import { useNavigate } from 'react-router-dom';
+
+interface Pregunta {
+  id: number;
+  texto: string;
+  respuestas: string[];
+  editando: boolean;
+}
 
 export const AdminPanel: React.FC = () => {
   const [activeSection, setActiveSection] = useState('Inicio');
+
+  // Mueve el estado del formulario dentro del componente
+  const [formulario, setFormulario] = useState({
+    titulo: '',
+    preguntas: [] as Pregunta[],
+  });
+
+const navigate = useNavigate(); // Inicializa useNavigate
+
+  const handleLogout = () => {
+    // Aquí puedes agregar lógica adicional, como limpiar el estado global o localStorage
+    navigate('/login'); // Redirige al login
+  };
 
   const renderContent = () => {
     switch (activeSection) {
@@ -18,12 +39,17 @@ export const AdminPanel: React.FC = () => {
         return <p>Bienvenido al Panel de Administración</p>;
       case 'Perfil':
         return <p>Esta es la sección de Perfil</p>;
-      case 'Dashboard':
+      case 'Dashboard': 
         return <p>Esta es la sección de Dashboard</p>;
       case 'Ver Respuestas':
         return <p>Esta es la sección de Ver Respuestas</p>;
       case 'Crear Formulario':
-        return <CrearFormulario />;
+        return (
+          <CrearFormulario
+            formulario={formulario}
+            setFormulario={setFormulario}
+          />
+        );
       case 'Agregar Asignatura':
         return <p>Esta es la sección de Agregar Asignatura</p>;
       case 'Designar Asignatura en Estudiante':
@@ -74,14 +100,12 @@ export const AdminPanel: React.FC = () => {
           <li onClick={() => setActiveSection('Crear Usuario')}>
             <PersonAddIcon className="menu-icon" /> Crear Usuario
           </li>
-          <li className="logout" onClick={() => setActiveSection('Cerrar Sesión')}>
+          <li className="logout" onClick={handleLogout}>
             <LogoutIcon className="menu-icon" /> Cerrar Sesión
           </li>
         </ul>
       </div>
-      <div className="content">
-        {renderContent()}
-      </div>
+      <div className="content">{renderContent()}</div>
     </div>
   );
 };

@@ -12,10 +12,26 @@ interface Pregunta {
   editando: boolean;
 }
 
-export const CrearFormulario: React.FC = () => {
-  const [titulo, setTitulo] = useState('');
+interface CrearFormularioProps {
+  formulario: {
+    titulo: string;
+    preguntas: Pregunta[];
+  };
+  setFormulario: React.Dispatch<
+    React.SetStateAction<{
+      titulo: string;
+      preguntas: Pregunta[];
+    }>
+  >;
+}
+
+export const CrearFormulario: React.FC<CrearFormularioProps> = ({
+  formulario,
+  setFormulario,
+}) => {
+  const { titulo, preguntas } = formulario;
+
   const [editandoTitulo, setEditandoTitulo] = useState(true);
-  const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
 
   const agregarPregunta = () => {
     const nuevaPregunta: Pregunta = {
@@ -24,20 +40,25 @@ export const CrearFormulario: React.FC = () => {
       respuestas: ['', '', '', ''], // 4 alternativas por defecto
       editando: true,
     };
-    setPreguntas([...preguntas, nuevaPregunta]);
+    setFormulario({
+      ...formulario,
+      preguntas: [...preguntas, nuevaPregunta],
+    });
   };
 
   const actualizarPregunta = (id: number, texto: string) => {
-    setPreguntas(
-      preguntas.map((pregunta) =>
+    setFormulario({
+      ...formulario,
+      preguntas: preguntas.map((pregunta) =>
         pregunta.id === id ? { ...pregunta, texto } : pregunta
-      )
-    );
+      ),
+    });
   };
 
   const actualizarRespuesta = (id: number, index: number, texto: string) => {
-    setPreguntas(
-      preguntas.map((pregunta) =>
+    setFormulario({
+      ...formulario,
+      preguntas: preguntas.map((pregunta) =>
         pregunta.id === id
           ? {
               ...pregunta,
@@ -46,42 +67,53 @@ export const CrearFormulario: React.FC = () => {
               ),
             }
           : pregunta
-      )
-    );
+      ),
+    });
   };
 
   const agregarAlternativa = (id: number) => {
-    setPreguntas(
-      preguntas.map((pregunta) =>
+    setFormulario({
+      ...formulario,
+      preguntas: preguntas.map((pregunta) =>
         pregunta.id === id
           ? { ...pregunta, respuestas: [...pregunta.respuestas, ''] }
           : pregunta
-      )
-    );
+      ),
+    });
   };
 
   const guardarPregunta = (id: number) => {
-    setPreguntas(
-      preguntas.map((pregunta) =>
+    setFormulario({
+      ...formulario,
+      preguntas: preguntas.map((pregunta) =>
         pregunta.id === id ? { ...pregunta, editando: false } : pregunta
-      )
-    );
+      ),
+    });
   };
 
   const editarPregunta = (id: number) => {
-    setPreguntas(
-      preguntas.map((pregunta) =>
+    setFormulario({
+      ...formulario,
+      preguntas: preguntas.map((pregunta) =>
         pregunta.id === id ? { ...pregunta, editando: true } : pregunta
-      )
-    );
+      ),
+    });
   };
 
   const eliminarPregunta = (id: number) => {
-    setPreguntas(
-      preguntas
+    setFormulario({
+      ...formulario,
+      preguntas: preguntas
         .filter((pregunta) => pregunta.id !== id)
-        .map((pregunta, index) => ({ ...pregunta, id: index + 1 }))
-    );
+        .map((pregunta, index) => ({ ...pregunta, id: index + 1 })),
+    });
+  };
+
+  const actualizarTitulo = (nuevoTitulo: string) => {
+    setFormulario({
+      ...formulario,
+      titulo: nuevoTitulo,
+    });
   };
 
   const guardarTitulo = () => {
@@ -101,7 +133,7 @@ export const CrearFormulario: React.FC = () => {
             type="text"
             placeholder="Nombre de la asignatura"
             value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
+            onChange={(e) => actualizarTitulo(e.target.value)}
             className="titulo-input"
           />
         ) : (

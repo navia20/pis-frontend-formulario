@@ -1,0 +1,118 @@
+/* Contenedor principal */
+.formulario-estudiante {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Título del formulario */
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+/* Contenedor de preguntas */
+.preguntas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Estilo de cada pregunta */
+.pregunta {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pregunta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pregunta-header h3 {
+  margin: 0;
+}
+
+.pregunta-texto {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Contenedor de respuestas */
+.respuestas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Estilo de cada respuesta */
+.respuesta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.respuesta:hover {
+  background-color: #e8f4fc;
+  border-color: #3498db;
+}
+
+.respuesta input[type='radio'] {
+  display: none; /* Oculta el botón de radio */
+}
+
+/* Respuesta seleccionada */
+.respuesta.seleccionada {
+  background-color: #d4edda; /* Verde claro */
+  border-color: #28a745; /* Verde */
+  color: #155724; /* Texto verde oscuro */
+}
+
+/* Botón de enviar */
+.btn-enviar {
+  margin-top: 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-enviar:hover {
+  background-color: #2980b9;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Mensaje de formulario enviado */
+.mensaje-enviado {
+  margin-top: 20px;
+  text-align: center;
+  color: #2ecc71;
+  font-weight: bold;
+  background-color: #eafaf1;
+  border: 1px solid #2ecc71;
+  padding: 10px;
+  border-radius: 5px;
+}
