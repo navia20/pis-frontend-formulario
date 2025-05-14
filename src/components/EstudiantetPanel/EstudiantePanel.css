@@ -102,3 +102,54 @@
   height: 100vh; /* Asegura que cubra toda la altura */
   overflow-y: auto; /* Permite desplazamiento si el contenido es muy largo */
 }
+
+/* Lista de formularios */
+.lista-formularios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.formulario-cuadro {
+  width: 200px;
+  height: 150px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.formulario-cuadro:hover {
+  background-color: #e8f4fc;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.formulario-cuadro h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Botón de retroceder */
+.btn-retroceder {
+  margin-bottom: 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: block;
+}
+
+.btn-retroceder:hover {
+  background-color: #2980b9;
+}

@@ -14,26 +14,51 @@ interface Pregunta {
   respuestas: string[];
 }
 
+interface Formulario {
+  id: number;
+  titulo: string;
+  preguntas: Pregunta[];
+}
+
 export const EstudiantePanel: React.FC = () => {
   const [activeSection, setActiveSection] = useState('Inicio');
-  
-  const [formulario] = useState({
-    titulo: 'Formulario de Ejemplo',
-    preguntas: [
-      {
-        id: 1,
-        texto: '¿Cuál es tu color favorito?',
-        respuestas: ['Rojo', 'Azul', 'Verde', 'Amarillo'],
-      },
-      {
-        id: 2,
-        texto: '¿Cuál es tu animal favorito?',
-        respuestas: ['Perro', 'Gato', 'Pájaro', 'Pez'],
-      },
-    ] as Pregunta[],
-  });
+  const [formularioSeleccionado, setFormularioSeleccionado] = useState<Formulario | null>(null);
 
-// Estado para las respuestas seleccionadas
+  const formularios: Formulario[] = [
+    {
+      id: 1,
+      titulo: 'Formulario Ejemplo 1',
+      preguntas: [
+        {
+          id: 1,
+          texto: '¿Cuál es tu color favorito?',
+          respuestas: ['Rojo', 'Azul', 'Verde', 'Amarillo'],
+        },
+        {
+          id: 2,
+          texto: '¿Cuál es tu animal favorito?',
+          respuestas: ['Perro', 'Gato', 'Pájaro', 'Pez'],
+        },
+      ],
+    },
+    {
+      id: 2,
+      titulo: 'Formulario Ejemplo 2',
+      preguntas: [
+        {
+          id: 1,
+          texto: '¿Qué lenguaje de programación prefieres?',
+          respuestas: ['JavaScript', 'Python', 'Java', 'C#'],
+        },
+        {
+          id: 2,
+          texto: '¿Cuál es tu sistema operativo favorito?',
+          respuestas: ['Windows', 'macOS', 'Linux', 'Otro'],
+        },
+      ],
+    },
+  ];
+
   const [respuestasSeleccionadas, setRespuestasSeleccionadas] = useState<{ [key: number]: string }>({});
 
   const navigate = useNavigate();
@@ -43,6 +68,21 @@ export const EstudiantePanel: React.FC = () => {
   };
 
   const renderContent = () => {
+    if (formularioSeleccionado) {
+      return (
+        <div>
+          <button className="btn-retroceder" onClick={() => setFormularioSeleccionado(null)}>
+            Retroceder
+          </button>
+          <FormularioEstudiante
+            formulario={formularioSeleccionado}
+            respuestasSeleccionadas={respuestasSeleccionadas}
+            setRespuestasSeleccionadas={setRespuestasSeleccionadas}
+          />
+        </div>
+      );
+    }
+
     switch (activeSection) {
       case 'Inicio':
         return <p>Bienvenido al Panel de Estudiante</p>;
@@ -50,11 +90,17 @@ export const EstudiantePanel: React.FC = () => {
         return <p>Esta es la sección de Perfil</p>;
       case 'Responder Formulario':
         return (
-          <FormularioEstudiante
-            formulario={formulario}
-            respuestasSeleccionadas={respuestasSeleccionadas}
-            setRespuestasSeleccionadas={setRespuestasSeleccionadas}
-            />
+          <div className="lista-formularios">
+            {formularios.map((formulario) => (
+              <div
+                key={formulario.id}
+                className="formulario-cuadro"
+                onClick={() => setFormularioSeleccionado(formulario)}
+              >
+                <h3>{formulario.titulo}</h3>
+              </div>
+            ))}
+          </div>
         );
       case 'Ver Respuestas':
         return <p>Esta es la sección de Ver Respuestas</p>;
