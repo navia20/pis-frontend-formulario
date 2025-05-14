@@ -6,6 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
+import { RespuestasEstudiantes } from './RespuestasEstudiantes/RespuestasEstudiantes'; 
 
 export const DocentePanel: React.FC = () => {
   const [activeSection, setActiveSection] = useState('Inicio');
@@ -24,7 +25,7 @@ export const DocentePanel: React.FC = () => {
       case 'Dashboard':
         return <p>Esta es la sección de Dashboard</p>;
       case 'Ver Respuestas Estudiantes':
-        return <p>Esta es la sección de Ver Respuestas Estudiantes</p>;
+        return <RespuestasEstudiantes />; 
       default:
         return <p>Selecciona una opción</p>;
     }
