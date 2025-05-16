@@ -13,7 +13,7 @@ export const DocentePanel: React.FC = () => {
   const navigate = useNavigate(); // Inicializa useNavigate
 
   const handleLogout = () => {
-    navigate('/login'); // Redirige al login
+    navigate('/'); // Redirige al login
   };
 
   const renderContent = () => {

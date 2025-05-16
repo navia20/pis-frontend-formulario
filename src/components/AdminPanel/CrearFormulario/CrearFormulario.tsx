@@ -10,35 +10,47 @@ interface Pregunta {
   texto: string;
   respuestas: string[];
   editando: boolean;
+  respuestaCorrecta?: number; // NUEVO: índice de la respuesta correcta
 }
 
 interface CrearFormularioProps {
   formulario: {
+    id: number;
     titulo: string;
     preguntas: Pregunta[];
+    asignatura?: string | null;
+    enviado?: boolean;
+    editandoTitulo?: boolean;
   };
-  setFormulario: React.Dispatch<
-    React.SetStateAction<{
-      titulo: string;
-      preguntas: Pregunta[];
-    }>
-  >;
+  setFormulario: React.Dispatch<React.SetStateAction<any>>;
+  onGuardar: (formulario: any) => void;
+  soloLectura?: boolean;
 }
 
 export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   formulario,
   setFormulario,
+  onGuardar,
+  soloLectura = false,
 }) => {
   const { titulo, preguntas } = formulario;
 
-  const [editandoTitulo, setEditandoTitulo] = useState(true);
+  const [editandoTitulo, setEditandoTitulo] = useState(
+    formulario.editandoTitulo ?? !soloLectura
+  );
+  const [errorTitulo, setErrorTitulo] = useState('');
+  const [errorPregunta, setErrorPregunta] = useState<{ [id: number]: string }>({});
+  const [errorFormulario, setErrorFormulario] = useState('');
 
+  // Agrega una nueva pregunta al formulario
   const agregarPregunta = () => {
+    if (soloLectura) return;
     const nuevaPregunta: Pregunta = {
       id: preguntas.length + 1,
       texto: '',
-      respuestas: ['', '', '', ''], // 4 alternativas por defecto
+      respuestas: ['', '', '', ''],
       editando: true,
+      respuestaCorrecta: undefined,
     };
     setFormulario({
       ...formulario,
@@ -46,19 +58,23 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
+  // Actualiza el texto de una pregunta
   const actualizarPregunta = (id: number, texto: string) => {
+    if (soloLectura) return;
     setFormulario({
       ...formulario,
-      preguntas: preguntas.map((pregunta) =>
+      preguntas: preguntas.map((pregunta: Pregunta) =>
         pregunta.id === id ? { ...pregunta, texto } : pregunta
       ),
     });
   };
 
+  // Actualiza el texto de una respuesta de una pregunta
   const actualizarRespuesta = (id: number, index: number, texto: string) => {
+    if (soloLectura) return;
     setFormulario({
       ...formulario,
-      preguntas: preguntas.map((pregunta) =>
+      preguntas: preguntas.map((pregunta: Pregunta) =>
         pregunta.id === id
           ? {
               ...pregunta,
@@ -71,10 +87,25 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  const agregarAlternativa = (id: number) => {
+  // Selecciona la respuesta correcta
+  const seleccionarRespuestaCorrecta = (id: number, index: number) => {
+    if (soloLectura) return;
     setFormulario({
       ...formulario,
-      preguntas: preguntas.map((pregunta) =>
+      preguntas: preguntas.map((pregunta: Pregunta) =>
+        pregunta.id === id
+          ? { ...pregunta, respuestaCorrecta: index }
+          : pregunta
+      ),
+    });
+  };
+
+  // Agrega una alternativa a una pregunta
+  const agregarAlternativa = (id: number) => {
+    if (soloLectura) return;
+    setFormulario({
+      ...formulario,
+      preguntas: preguntas.map((pregunta: Pregunta) =>
         pregunta.id === id
           ? { ...pregunta, respuestas: [...pregunta.respuestas, ''] }
           : pregunta
@@ -82,135 +113,254 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
+  // Guarda una pregunta (deja de estar en modo edición)
   const guardarPregunta = (id: number) => {
+    if (soloLectura) return;
+    const pregunta = preguntas.find((p: Pregunta) => p.id === id);
+    let error = '';
+    if (!pregunta) return;
+    if (!pregunta.texto.trim()) error = 'La pregunta no puede estar vacía.';
+    else if (pregunta.respuestas.some((r) => !r.trim())) error = 'Todas las respuestas deben estar llenas.';
+    else if (
+      pregunta.respuestaCorrecta === undefined ||
+      !pregunta.respuestas[pregunta.respuestaCorrecta] ||
+      !pregunta.respuestas[pregunta.respuestaCorrecta].trim()
+    )
+      error = 'Debes seleccionar una respuesta correcta.';
+    if (error) {
+      setErrorPregunta((prev) => ({ ...prev, [id]: error }));
+      return;
+    }
+    setErrorPregunta((prev) => ({ ...prev, [id]: '' }));
     setFormulario({
       ...formulario,
-      preguntas: preguntas.map((pregunta) =>
+      preguntas: preguntas.map((pregunta: Pregunta) =>
         pregunta.id === id ? { ...pregunta, editando: false } : pregunta
       ),
     });
   };
 
+  // Permite editar una pregunta
   const editarPregunta = (id: number) => {
+    if (soloLectura) return;
     setFormulario({
       ...formulario,
-      preguntas: preguntas.map((pregunta) =>
+      preguntas: preguntas.map((pregunta: Pregunta) =>
         pregunta.id === id ? { ...pregunta, editando: true } : pregunta
       ),
     });
   };
 
+  // Elimina una pregunta y reordena los IDs
   const eliminarPregunta = (id: number) => {
+    if (soloLectura) return;
     setFormulario({
       ...formulario,
       preguntas: preguntas
-        .filter((pregunta) => pregunta.id !== id)
-        .map((pregunta, index) => ({ ...pregunta, id: index + 1 })),
+        .filter((pregunta: Pregunta) => pregunta.id !== id)
+        .map((pregunta: Pregunta, index: number) => ({ ...pregunta, id: index + 1 })),
     });
   };
 
+  // Actualiza el título del formulario
   const actualizarTitulo = (nuevoTitulo: string) => {
+    if (soloLectura) return;
     setFormulario({
       ...formulario,
       titulo: nuevoTitulo,
+      editandoTitulo: true,
     });
   };
 
+  // Guarda el título (deja de estar en modo edición)
   const guardarTitulo = () => {
+    if (soloLectura) return;
+    if (!titulo.trim()) {
+      setErrorTitulo('El título no puede estar vacío.');
+      return;
+    }
+    setErrorTitulo('');
     setEditandoTitulo(false);
+    setFormulario({
+      ...formulario,
+      editandoTitulo: false,
+    });
   };
 
+  // Permite editar el título
   const editarTitulo = () => {
+    if (soloLectura) return;
     setEditandoTitulo(true);
+    setFormulario({
+      ...formulario,
+      editandoTitulo: true,
+    });
+  };
+
+  // Guarda el formulario completo y vuelve a la lista de formularios
+  const guardarFormularioCompleto = () => {
+    if (soloLectura) return;
+    if (!titulo.trim()) {
+      setErrorFormulario('El título no puede estar vacío.');
+      return;
+    }
+    if (preguntas.length === 0) {
+      setErrorFormulario('Debe haber al menos una pregunta.');
+      return;
+    }
+    // Ya no se valida si las preguntas están completas o guardadas
+    setErrorFormulario('');
+    onGuardar(formulario);
   };
 
   return (
-    <div className="crear-formulario">
-      <h1>Crear Formulario</h1>
-      <div className="titulo-container">
-        {editandoTitulo ? (
+    <div className="cf-crear-formulario">
+      <h1>{soloLectura ? 'Ver Formulario' : 'Crear Formulario'}</h1>
+      <div className="cf-titulo-container">
+        {editandoTitulo && !soloLectura ? (
           <input
             type="text"
             placeholder="Nombre de la asignatura"
             value={titulo}
             onChange={(e) => actualizarTitulo(e.target.value)}
-            className="titulo-input"
+            className="cf-titulo-input"
+            disabled={soloLectura}
           />
         ) : (
           <h2>{titulo}</h2>
         )}
-        <button
-          className="btn-titulo"
-          onClick={editandoTitulo ? guardarTitulo : editarTitulo}
-        >
-          {editandoTitulo ? <SaveIcon /> : <EditIcon />}
-        </button>
+        {!soloLectura && (
+          <button
+            className="cf-btn-titulo"
+            onClick={editandoTitulo ? guardarTitulo : editarTitulo}
+          >
+            {editandoTitulo ? <SaveIcon /> : <EditIcon />}
+          </button>
+        )}
       </div>
-      <div className="preguntas-container">
-        {preguntas.map((pregunta) => (
-          <div key={pregunta.id} className="pregunta">
-            <div className="pregunta-header">
+      {errorTitulo && <div style={{ color: 'red', marginBottom: 10 }}>{errorTitulo}</div>}
+      <div className="cf-preguntas-container">
+        {preguntas.map((pregunta: Pregunta) => (
+          <div key={pregunta.id} className="cf-pregunta">
+            <div className="cf-pregunta-header">
               <h3>Pregunta {pregunta.id}</h3>
-              <button
-                className="btn-eliminar"
-                onClick={() => eliminarPregunta(pregunta.id)}
-              >
-                <DeleteIcon />
-              </button>
+              {!soloLectura && (
+                <button
+                  className="cf-btn-eliminar"
+                  onClick={() => eliminarPregunta(pregunta.id)}
+                >
+                  <DeleteIcon />
+                </button>
+              )}
             </div>
             <textarea
               value={pregunta.texto}
               onChange={(e) => actualizarPregunta(pregunta.id, e.target.value)}
-              disabled={!pregunta.editando}
+              disabled={!pregunta.editando || soloLectura}
               placeholder="Escribe la pregunta aquí..."
+              className="cf-textarea"
             />
-            <div className="respuestas">
+            <div className="cf-respuestas">
               {pregunta.respuestas.map((respuesta, index) => (
-                <input
+                <div
                   key={index}
-                  type="text"
-                  value={respuesta}
-                  onChange={(e) =>
-                    actualizarRespuesta(pregunta.id, index, e.target.value)
-                  }
-                  placeholder={`Respuesta ${index + 1}`}
-                  disabled={!pregunta.editando}
-                />
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: 4,
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={respuesta}
+                    onChange={(e) =>
+                      actualizarRespuesta(pregunta.id, index, e.target.value)
+                    }
+                    placeholder={`Respuesta ${index + 1}`}
+                    disabled={!pregunta.editando || soloLectura}
+                    style={{
+                      border:
+                        pregunta.respuestaCorrecta === index
+                          ? '2px solid #27ae60'
+                          : undefined,
+                      background:
+                        pregunta.respuestaCorrecta === index
+                          ? '#eafaf1'
+                          : undefined,
+                      marginRight: 8,
+                      flex: 1,
+                    }}
+                    onClick={() =>
+                      pregunta.editando && !soloLectura
+                        ? seleccionarRespuestaCorrecta(pregunta.id, index)
+                        : undefined
+                    }
+                  />
+                  {pregunta.editando && !soloLectura && (
+                    <input
+                      type="radio"
+                      name={`respuesta-correcta-${pregunta.id}`}
+                      checked={pregunta.respuestaCorrecta === index}
+                      onChange={() =>
+                        seleccionarRespuestaCorrecta(pregunta.id, index)
+                      }
+                      style={{ accentColor: '#27ae60', marginLeft: 4 }}
+                    />
+                  )}
+                </div>
               ))}
-              {pregunta.editando && (
+              {pregunta.editando && !soloLectura && (
                 <button
-                  className="btn-agregar-alternativa"
+                  className="cf-btn-agregar-alternativa"
                   onClick={() => agregarAlternativa(pregunta.id)}
                 >
                   <AddIcon /> Agregar Alternativa
                 </button>
               )}
             </div>
-            <div className="pregunta-actions">
-              {pregunta.editando ? (
-                <button
-                  className="btn-guardar"
-                  onClick={() => guardarPregunta(pregunta.id)}
-                >
-                  <SaveIcon />
-                </button>
-              ) : (
-                <button
-                  className="btn-editar"
-                  onClick={() => editarPregunta(pregunta.id)}
-                >
-                  <EditIcon />
-                </button>
-              )}
+            <div className="cf-pregunta-actions">
+              {!soloLectura &&
+                (pregunta.editando ? (
+                  <button
+                    className="cf-btn-guardar"
+                    onClick={() => guardarPregunta(pregunta.id)}
+                  >
+                    <SaveIcon />
+                  </button>
+                ) : (
+                  <button
+                    className="cf-btn-editar"
+                    onClick={() => editarPregunta(pregunta.id)}
+                  >
+                    <EditIcon />
+                  </button>
+                ))}
             </div>
+            {errorPregunta[pregunta.id] && (
+              <div style={{ color: 'red', marginTop: 5 }}>
+                {errorPregunta[pregunta.id]}
+              </div>
+            )}
           </div>
         ))}
       </div>
-      <div className="btn-agregar-container">
-        <button className="btn-agregar" onClick={agregarPregunta}>
-          <AddIcon /> Agregar Pregunta
-        </button>
-      </div>
+      {!soloLectura && (
+        <>
+          <div className="cf-btn-agregar-container">
+            <button className="cf-btn-agregar" onClick={agregarPregunta}>
+              <AddIcon /> Agregar Pregunta
+            </button>
+          </div>
+          <div className="cf-btn-guardar-formulario-container">
+            <button className="cf-btn-guardar-formulario" onClick={guardarFormularioCompleto}>
+              Guardar Formulario Completo
+            </button>
+          </div>
+          {errorFormulario && (
+            <div style={{ color: 'red', marginTop: 10 }}>{errorFormulario}</div>
+          )}
+        </>
+      )}
     </div>
   );
 };

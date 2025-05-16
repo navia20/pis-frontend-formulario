@@ -64,7 +64,7 @@ export const EstudiantePanel: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate('/login');
+    navigate('/');
   };
 
   const renderContent = () => {

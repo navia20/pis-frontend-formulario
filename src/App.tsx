@@ -9,7 +9,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<LoginForm />} />
+        <Route path="/" element={<LoginForm />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/estudiante" element={<EstudiantePanel />} />
         <Route path="/docente" element={<DocentePanel />} />
@@ -18,4 +18,4 @@ function App() {
   );
 }
 
-export default App; // Cambiar a exportación por defecto
+export default App;

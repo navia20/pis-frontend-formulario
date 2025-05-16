@@ -1,64 +1,102 @@
-.crear-formulario {
+.cf-crear-formulario {
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
 }
 
-.titulo-input {
+.cf-titulo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  position: relative;
+  justify-content: flex-start;
+}
+
+.cf-titulo-input {
+  flex: 1;
   width: 100%;
   padding: 10px;
-  margin-bottom: 20px;
-  font-size: 1.2rem;
+  margin-bottom: 0;
+  font-size: 1.3rem;
   border: 1px solid #ddd;
   border-radius: 5px;
 }
 
-.preguntas-container {
+.cf-btn-titulo {
+  position: static;
+  margin-left: 10px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.cf-titulo-container h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+}
+
+.cf-preguntas-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.pregunta {
+.cf-pregunta {
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 15px;
   background-color: #f9f9f9;
-  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Espacio entre los elementos internos */
+  gap: 10px;
 }
 
-.pregunta-header {
+.cf-pregunta-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.pregunta-header h3 {
+.cf-pregunta-header h3 {
   margin: 0;
 }
 
-textarea,
-.respuestas input {
-  width: calc(100% - 20px); /* Reduce el ancho para que no exceda el padding del contenedor */
-  padding: 8px; /* Ajusta el padding para que sea más pequeño */
-  font-size: 1rem;
+/* Pregunta textarea más grande y clara */
+.cf-pregunta textarea,
+.cf-textarea {
+  width: 100%;
+  min-height: 60px;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #2c3550;
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  resize: vertical;
 }
 
-.respuestas {
+.cf-respuestas {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Espacio entre las respuestas */
+  gap: 10px;
   margin-top: 10px;
-  width: 100%; /* Asegura que las respuestas no excedan el ancho del contenedor */
+  width: 100%;
 }
 
-.btn-agregar-alternativa {
+.cf-btn-agregar-alternativa {
   margin-top: 10px;
   background-color: #2ecc71;
   color: white;
@@ -69,25 +107,37 @@ textarea,
   display: flex;
   align-items: center;
   gap: 5px;
-  width: fit-content; /* Ajusta el ancho al contenido del botón */
+  width: fit-content;
 }
 
-.respuestas input {
+.cf-respuestas input[type="text"] {
   width: 100%;
   padding: 10px;
   font-size: 1rem;
   border: 1px solid #ddd;
   border-radius: 5px;
+  transition: border 0.2s, background 0.2s;
 }
 
-.pregunta-actions {
+/* Respuesta seleccionada como correcta: borde y fondo verde */
+.cf-respuestas input[type="text"].respuesta-correcta {
+  border: 2px solid #27ae60 !important;
+  background: #eafaf1 !important;
+}
+
+.cf-respuestas input[type="radio"] {
+  accent-color: #27ae60;
+  margin-left: 4px;
+}
+
+.cf-pregunta-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 10px;
 }
 
-.btn-eliminar {
+.cf-btn-eliminar {
   background-color: red;
   color: white;
   border: none;
@@ -98,8 +148,8 @@ textarea,
   align-items: center;
 }
 
-.btn-guardar,
-.btn-editar {
+.cf-btn-guardar,
+.cf-btn-editar {
   background-color: #3498db;
   color: white;
   border: none;
@@ -110,7 +160,7 @@ textarea,
   align-items: center;
 }
 
-.btn-agregar {
+.cf-btn-agregar {
   margin-top: 20px;
   background-color: #2ecc71;
   color: white;
@@ -124,43 +174,34 @@ textarea,
   gap: 10px;
 }
 
-.btn-agregar-container {
+.cf-btn-agregar-container {
   display: flex;
   justify-content: center;
   margin-top: 20px;
-  
 }
 
-.titulo-container {
+/* Botón guardar formulario completo: azul y destacado */
+.cf-btn-guardar-formulario-container {
   display: flex;
-  justify-content: center; /* Centra el título horizontalmente */
-  align-items: center; /* Alinea el título y el botón verticalmente */
-  gap: 10px; /* Espacio entre el título y el botón */
-  margin-bottom: 20px;
-  position: relative; /* Permite posicionar el botón a la derecha */
+  justify-content: flex-end;
+  margin-top: 30px;
 }
 
-.titulo-container .btn-titulo {
-  position: absolute;
-  right: 0; /* Coloca el botón a la derecha del contenedor */
-}
-
-.titulo-container h2 {
-  font-size: 2rem; /* Tamaño más grande para el título */
-  font-weight: bold; /* Hace que el título sea más destacado */
-  margin: 0; /* Elimina márgenes adicionales */
-  text-align: center; /* Asegura que el texto esté centrado */
-}
-
-.btn-titulo {
+.cf-btn-guardar-formulario {
   background-color: #3498db;
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 10px 22px;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1rem;
+  gap: 10px;
+  transition: background 0.2s;
+}
+
+.cf-btn-guardar-formulario:hover {
+  background-color: #217dbb;
 }

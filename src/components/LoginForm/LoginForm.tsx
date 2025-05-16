@@ -49,55 +49,64 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
+  <div className="login-root">
     <div className="login-container">
       <Logo />
-      
-      <h1>Bienvenido(a) al Sistema de medición Resultados de Aprendizaje</h1>
-        <h2>Iniciar Sesión</h2>
-      
-      
+
+      <h1 className="login-title">Bienvenido(a) al Sistema de medición Resultados de Aprendizaje</h1>
+      <h2 className="login-subtitle">Iniciar Sesión</h2>
+
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="rut">RUT con dígito y sin guión</label>
+        <div className="login-form-group">
+          <h3 className="login-h3">
+            <label htmlFor="rut" className="login-label">RUT con dígito y sin guión</label>
+          </h3>
           <input
             type="text"
             id="rut"
+            className="login-input"
             value={rut}
             onChange={(e) => setRut(e.target.value)}
             placeholder="Ej: 12345678K"
             required
           />
         </div>
-        
-        <div className="form-group">
-          <label htmlFor="password">Contraseña</label>
+
+        <div className="login-form-group">
+          <h3 className="login-h3">
+            <label htmlFor="password" className="login-label">Contraseña</label>
+          </h3>
           <input
             type="password"
             id="password"
+            className="login-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        
-        <div className="checkbox-container">
+
+        <div className="login-checkbox-container">
           <input
             type="checkbox"
             id="remember"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
           />
-          <label htmlFor="remember">Recordar mis datos</label>
+          <h3 className="login-h3">
+            <label htmlFor="remember" className="login-label">Recordar mis datos</label>
+          </h3>
         </div>
-        
-        {error && <div className="error-message">{error}</div>}
-        
-        <div className="forgot-password">
+
+        {error && <div className="login-error-message">{error}</div>}
+
+        <div className="login-forgot-password">
           <a href="/forgot-password">¿Olvidaste tu Contraseña?</a>
         </div>
-        
-        <button type="submit" className="btn">Ingresar</button>
+
+        <button type="submit" className="login-btn">Ingresar</button>
       </form>
     </div>
-  );
+  </div>
+);
 };
