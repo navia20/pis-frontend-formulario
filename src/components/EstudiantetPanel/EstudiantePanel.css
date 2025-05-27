@@ -1,34 +1,34 @@
 /* Contenedor principal */
 .estudiante-panel {
   display: flex;
-  height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
-  width: 100vw; /* Asegura que ocupe todo el ancho de la ventana */
-  margin: 0; /* Elimina márgenes */
-  padding: 0; /* Elimina padding */
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
 }
 
 /* Barra lateral */
 .estudiante-sidebar {
-  width: 300px; /* Ancho de la barra lateral */
-  background-image: url('../../assets/images/celeste.jpg'); /* Fondo de la imagen */
-  background-size: cover; /* Escala la imagen para cubrir toda la barra */
-  background-position: center; /* Centra la imagen */
+  width: 300px;
+  background-image: url('../../assets/images/celeste.jpg');
+  background-size: cover;
+  background-position: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px 0;
-  height: 100vh; /* Asegura que la barra lateral cubra toda la altura */
-  position: fixed; /* Fija la barra lateral al margen izquierdo */
-  left: 0; /* Asegura que esté alineada al margen izquierdo */
-  top: 0; /* Asegura que comience desde la parte superior */
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
 }
 
 /* Contenedor del logo */
 .estudiante-logo-container {
   display: flex;
-  justify-content: space-between; /* Coloca los logos uno al lado del otro */
+  justify-content: space-between;
   align-items: center;
-  width: 100%; /* Asegura que ocupe todo el ancho de la barra lateral */
+  width: 100%;
   padding: 10px;
   margin-bottom: 20px;
 }
@@ -41,7 +41,7 @@
 .estudiante-logo-left {
   width: 100px;
   height: 100px;
-  border-radius: 50%; /* Hace que el logo sea circular */
+  border-radius: 50%;
   background-image: url('../../assets/images/LogoUCN.png');
 }
 
@@ -60,7 +60,7 @@
 
 .estudiante-menu li {
   display: flex;
-  align-items: center; /* Alinea el ícono y el texto verticalmente */
+  align-items: center;
   padding: 15px 20px;
   color: white;
   cursor: pointer;
@@ -73,9 +73,9 @@
 }
 
 .estudiante-menu-icon {
-  margin-right: 10px; /* Espacio entre el ícono y el texto */
-  font-size: 1.5rem; /* Tamaño del ícono */
-  color: white; /* Color del ícono */
+  margin-right: 10px;
+  font-size: 1.5rem;
+  color: white;
 }
 
 /* Botón de cerrar sesión */
@@ -95,35 +95,45 @@
 
 /* Contenedor de contenido */
 .estudiante-content {
-  margin-left: 300px; /* Deja espacio para la barra lateral */
-  flex: 1; /* Hace que el contenido ocupe todo el espacio restante */
+  margin-left: 300px;
+  flex: 1;
   padding: 20px;
-  background-color: #f4f4f9; /* Fondo blanco */
-  height: 100vh; /* Asegura que cubra toda la altura */
-  overflow-y: auto; /* Permite desplazamiento si el contenido es muy largo */
+  background-color: #f4f4f9;
+  height: 100vh;
+  overflow-y: auto;
 }
 
-/* Lista de formularios */
+/* Lista de formularios mejorada */
 .lista-formularios {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  padding: 20px;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 20px 0;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
+/* Cuadro de formulario mejorado */
 .formulario-cuadro {
-  width: 200px;
-  height: 150px;
+  width: 100%;
+  max-width: 500px;
+  min-height: 170px;
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 8px;
   background-color: #f9f9f9;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
+  padding: 24px 28px;
+  word-break: break-word;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 0;
 }
 
 .formulario-cuadro:hover {
@@ -132,9 +142,17 @@
 }
 
 .formulario-cuadro h3 {
-  margin: 0;
-  font-size: 1.2rem;
+  margin: 0 0 12px 0;
+  font-size: 1.25rem;
   color: #333;
+  word-break: break-word;
+}
+
+.formulario-cuadro p {
+  margin: 6px 0;
+  font-size: 1.05rem;
+  color: #444;
+  word-break: break-word;
 }
 
 /* Botón de retroceder */
@@ -143,10 +161,10 @@
   background-color: #3498db;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 10px 24px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.05rem;
   display: block;
 }
 

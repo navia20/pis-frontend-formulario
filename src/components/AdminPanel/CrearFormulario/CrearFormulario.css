@@ -4,6 +4,54 @@
   margin: 0 auto;
 }
 
+/* CABECERA: Título a la izquierda, opciones a la derecha */
+.cf-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+
+.cf-header-row h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.cf-header-options {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.cf-header-options > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+}
+
+.cf-header-options label {
+  font-weight: 500;
+  color: #2c3550;
+}
+
+.cf-header-options select,
+.cf-header-options input[type="date"] {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #f9f9f9;
+}
+
+.cf-header-options span {
+  font-size: 1rem;
+  color: #444;
+}
+
+/* Título y botón editar/guardar */
 .cf-titulo-container {
   display: flex;
   align-items: center;

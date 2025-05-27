@@ -16,6 +16,7 @@ interface Formulario {
   titulo: string;
   preguntas: Pregunta[];
   asignatura?: string | null;
+  fechaLimite?: string | null;
   enviado?: boolean;
   editandoTitulo?: boolean;
 }
@@ -48,7 +49,8 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
         {
           ...formulario,
           id: prev.length ? Math.max(...prev.map((f) => f.id)) + 1 : 1,
-          asignatura: null,
+          asignatura: formulario.asignatura || null,
+          fechaLimite: formulario.fechaLimite || null,
           enviado: false,
           editandoTitulo: formulario.editandoTitulo ?? false,
         },
@@ -63,21 +65,13 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
     setMenuAbierto(null);
   };
 
-  // Asignar asignatura (simulado)
-  const handleAsignarAsignatura = (id: number) => {
-    setFormularios((prev) =>
-      prev.map((f) =>
-        f.id === id ? { ...f, asignatura: 'Asignatura X' } : f
-      )
-    );
-    setMenuAbierto(null);
-  };
-
   // Validar si el formulario está listo para enviar
   const puedeEnviarFormulario = (formulario: Formulario) => {
     if (!formulario.titulo.trim()) return false;
     if (formulario.editandoTitulo) return false;
     if (!formulario.preguntas.length) return false;
+    if (!formulario.asignatura) return false;
+    if (!formulario.fechaLimite) return false;
     for (const pregunta of formulario.preguntas) {
       if (pregunta.editando) return false;
       if (!pregunta.texto.trim()) return false;
@@ -89,6 +83,7 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
   const handleEnviarAsignatura = (id: number) => {
     const formulario = formularios.find((f) => f.id === id);
     if (!formulario || !puedeEnviarFormulario(formulario)) return;
+    // Aquí podrías hacer la petición a la API para guardar definitivamente el formulario
     setFormularios((prev) =>
       prev.map((f) =>
         f.id === id ? { ...f, enviado: true } : f
@@ -121,6 +116,18 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
       {formularios.map((formulario) => (
         <div key={formulario.id} className="admin-formulario-cuadro">
           <div className="admin-formulario-titulo">{formulario.titulo}</div>
+          <div className="admin-formulario-info">
+            {formulario.asignatura && (
+              <span className="admin-formulario-asignatura">
+                {formulario.asignatura}
+              </span>
+            )}
+            {formulario.fechaLimite && (
+              <span className="admin-formulario-fecha">
+                Límite: {new Date(formulario.fechaLimite).toLocaleDateString()}
+              </span>
+            )}
+          </div>
           <button
             className="admin-formulario-menu-btn"
             onClick={(e) => {
@@ -147,19 +154,13 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
               <button onClick={() => handleEliminarFormulario(formulario.id)}>
                 Eliminar
               </button>
-              <button
-                onClick={() => handleAsignarAsignatura(formulario.id)}
-                disabled={formulario.enviado}
-              >
-                Asignar Asignatura
-              </button>
               {formulario.asignatura && (
                 <button
                   onClick={() => handleEnviarAsignatura(formulario.id)}
                   disabled={formulario.enviado || !puedeEnviarFormulario(formulario)}
                   title={
                     !puedeEnviarFormulario(formulario)
-                      ? 'Debes guardar el título y todas las preguntas antes de enviar'
+                      ? 'Debes guardar el título, asignatura, fecha límite y todas las preguntas antes de enviar'
                       : undefined
                   }
                 >
@@ -191,6 +192,7 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
             titulo: '',
             preguntas: [],
             asignatura: null,
+            fechaLimite: null,
             enviado: false,
             editandoTitulo: true,
           })

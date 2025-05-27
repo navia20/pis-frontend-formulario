@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import './AdminPanel.css';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import EditSquareIcon from '@mui/icons-material/EditSquare';
 import { CrearFormulario } from './CrearFormulario/CrearFormulario';
 import { CuadroFormularios } from './CuadroFormularios/CuadroFormularios';
+import { Perfil } from '../Perfil/Perfil';
+import type { Usuario } from '../Perfil/Perfil';
 import { useNavigate } from 'react-router-dom';
+import { PanelInicio } from '../panel-incio/panel-inicio';
 
 interface Pregunta {
   id: number;
@@ -70,7 +72,21 @@ export const AdminPanel: React.FC = () => {
     setFormularioSeleccionado(null);
   };
 
+  // Usuario de ejemplo (puedes reemplazarlo por el usuario real logueado)
+  const adminUser: Usuario = {
+    id: '1',
+    nombres: 'Admin',
+    apellidos: 'Sistema',
+    rut: '12.345.678-9',
+    email: 'admin@universidad.cl',
+    tipo: 'admin',
+    rol: 'Administrador Principal'
+  };
+
   const renderContent = () => {
+    // Diagnóstico: muestra el valor actual de activeSection
+    // console.log('activeSection:', activeSection);
+
     if (formularioSoloLectura) {
       return (
         <div>
@@ -120,11 +136,26 @@ export const AdminPanel: React.FC = () => {
 
     switch (activeSection) {
       case 'Inicio':
-        return <p>Bienvenido al Panel de Administración</p>;
+        return <PanelInicio usuario={{
+          id: "admin1",
+          nombres: "eric ross",
+          apellidos: "General",
+          tipo: "admin",
+          total_usuarios: 120,
+          total_docentes: 15,
+          total_alumnos: 105,
+        }} />
       case 'Perfil':
-        return <p>Esta es la sección de Perfil</p>;
-      case 'Dashboard':
-        return <p>Esta es la sección de Dashboard</p>;
+        return (
+          <Perfil
+            usuario={adminUser}
+            editable={true}
+            onGuardar={(usuarioActualizado: Usuario) => {
+              console.log('Usuario actualizado:', usuarioActualizado);
+              // Aquí iría la lógica para actualizar el usuario en tu backend
+            }}
+          />
+        );
       case 'Ver Respuestas':
         return <p>Esta es la sección de Ver Respuestas</p>;
       case 'Agregar Asignatura':
@@ -155,9 +186,6 @@ export const AdminPanel: React.FC = () => {
           </li>
           <li onClick={() => setActiveSection('Perfil')}>
             <AccountCircleIcon className="menu-icon" /> Perfil
-          </li>
-          <li onClick={() => setActiveSection('Dashboard')}>
-            <DashboardIcon className="menu-icon" /> Dashboard
           </li>
           <li onClick={() => setActiveSection('Ver Respuestas')}>
             <SearchIcon className="menu-icon" /> Ver Respuestas

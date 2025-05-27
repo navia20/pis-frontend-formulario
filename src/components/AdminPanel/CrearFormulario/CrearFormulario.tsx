@@ -10,7 +10,7 @@ interface Pregunta {
   texto: string;
   respuestas: string[];
   editando: boolean;
-  respuestaCorrecta?: number; // NUEVO: índice de la respuesta correcta
+  respuestaCorrecta?: number;
 }
 
 interface CrearFormularioProps {
@@ -19,6 +19,7 @@ interface CrearFormularioProps {
     titulo: string;
     preguntas: Pregunta[];
     asignatura?: string | null;
+    fechaLimite?: string | null;
     enviado?: boolean;
     editandoTitulo?: boolean;
   };
@@ -33,7 +34,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   onGuardar,
   soloLectura = false,
 }) => {
-  const { titulo, preguntas } = formulario;
+  const { titulo, preguntas, asignatura, fechaLimite } = formulario;
 
   const [editandoTitulo, setEditandoTitulo] = useState(
     formulario.editandoTitulo ?? !soloLectura
@@ -41,6 +42,33 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   const [errorTitulo, setErrorTitulo] = useState('');
   const [errorPregunta, setErrorPregunta] = useState<{ [id: number]: string }>({});
   const [errorFormulario, setErrorFormulario] = useState('');
+
+  // Opciones de asignatura (simulado)
+  const asignaturasDisponibles = [
+    'Matemáticas',
+    'Lenguaje',
+    'Historia',
+    'Ciencias',
+    'Inglés',
+  ];
+
+  // NUEVO: Actualizar fecha límite
+  const actualizarFechaLimite = (nuevaFecha: string) => {
+    if (soloLectura) return;
+    setFormulario({
+      ...formulario,
+      fechaLimite: nuevaFecha,
+    });
+  };
+
+  // NUEVO: Actualizar asignatura
+  const actualizarAsignatura = (nuevaAsignatura: string) => {
+    if (soloLectura) return;
+    setFormulario({
+      ...formulario,
+      asignatura: nuevaAsignatura,
+    });
+  };
 
   // Agrega una nueva pregunta al formulario
   const agregarPregunta = () => {
@@ -208,14 +236,55 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
       setErrorFormulario('Debe haber al menos una pregunta.');
       return;
     }
-    // Ya no se valida si las preguntas están completas o guardadas
+    if (!formulario.asignatura) {
+      setErrorFormulario('Debes seleccionar una asignatura.');
+      return;
+    }
+    if (!formulario.fechaLimite) {
+      setErrorFormulario('Debes seleccionar una fecha límite.');
+      return;
+    }
     setErrorFormulario('');
     onGuardar(formulario);
   };
 
   return (
     <div className="cf-crear-formulario">
-      <h1>{soloLectura ? 'Ver Formulario' : 'Crear Formulario'}</h1>
+      <div className="cf-header-row">
+        <h1>{soloLectura ? 'Ver Formulario' : 'Crear Formulario'}</h1>
+        <div className="cf-header-options">
+          <div>
+            <label>Asignatura:&nbsp;</label>
+            {soloLectura ? (
+              <span>{asignatura || '-'}</span>
+            ) : (
+              <select
+                value={asignatura || ''}
+                onChange={e => actualizarAsignatura(e.target.value)}
+                disabled={soloLectura}
+              >
+                <option value="">Selecciona</option>
+                {asignaturasDisponibles.map((asig) => (
+                  <option key={asig} value={asig}>{asig}</option>
+                ))}
+              </select>
+            )}
+          </div>
+          <div style={{ marginLeft: 16 }}>
+            <label>Fecha límite:&nbsp;</label>
+            {soloLectura ? (
+              <span>{fechaLimite ? new Date(fechaLimite).toLocaleDateString() : '-'}</span>
+            ) : (
+              <input
+                type="date"
+                value={fechaLimite || ''}
+                onChange={e => actualizarFechaLimite(e.target.value)}
+                disabled={soloLectura}
+              />
+            )}
+          </div>
+        </div>
+      </div>
       <div className="cf-titulo-container">
         {editandoTitulo && !soloLectura ? (
           <input

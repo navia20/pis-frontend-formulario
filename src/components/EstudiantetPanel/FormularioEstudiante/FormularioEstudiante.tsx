@@ -14,12 +14,14 @@ interface FormularioEstudianteProps {
   };
   respuestasSeleccionadas: { [key: number]: string };
   setRespuestasSeleccionadas: React.Dispatch<React.SetStateAction<{ [key: number]: string }>>;
+  onEnviar: () => void;
 }
 
 export const FormularioEstudiante: React.FC<FormularioEstudianteProps> = ({
   formulario,
   respuestasSeleccionadas,
   setRespuestasSeleccionadas,
+  onEnviar
 }) => {
   const [mensajeEnviado, setMensajeEnviado] = useState(false);
 
@@ -31,8 +33,10 @@ export const FormularioEstudiante: React.FC<FormularioEstudianteProps> = ({
   };
 
   const manejarEnvioFormulario = () => {
-    setMensajeEnviado(true);
-    console.log('Respuestas enviadas:', respuestasSeleccionadas);
+    if (window.confirm("¿Estás seguro que quieres enviar tus respuestas? Una vez enviado no podrás modificarlo.")) {
+      setMensajeEnviado(true);
+      onEnviar();
+    }
   };
 
   return (
