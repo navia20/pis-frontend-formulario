@@ -9,7 +9,7 @@ import EditSquareIcon from '@mui/icons-material/EditSquare';
 import { CrearFormulario } from '../components/AdminPanel/CrearFormulario/CrearFormulario';
 import { CuadroFormularios } from '../components/AdminPanel/CuadroFormularios/CuadroFormularios';
 import { Perfil } from '../components/Perfil/Perfil';
-import type { Usuario } from '../components/Perfil/Perfil';
+import type { Usuario } from '../types/usuario';
 import { useNavigate } from 'react-router-dom';
 import { PanelInicio } from '../components/panel-incio/panel-inicio';
 import { encuestaService } from '../services/encuestaService';

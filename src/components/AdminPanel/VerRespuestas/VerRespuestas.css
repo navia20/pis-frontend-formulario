@@ -1,51 +1,179 @@
+/* Centrado y ancho máximo como en crear formulario */
+.ver-respuestas-root {
+  padding: 24px 0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Título principal */
+.ver-respuestas-root h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #2c3550;
+}
+
+/* Tarjeta de resumen de respuesta (selección) cuadrada como admin */
 .tabla-respuestas {
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
+  align-items: stretch; /* Estira todas las cards a la altura de la más grande */
   margin-top: 24px;
+  justify-content: flex-start;
 }
 
 .respuesta-card {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 20px 24px;
-  min-width: 320px;
-  max-width: 400px;
-  box-shadow: 0 2px 8px rgba(44, 53, 80, 0.07);
+  width: 220px;
+  min-height: 140px;
+  height: 100%;
+  background: #fff;
+  border: 2px solid #3498db;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transition: box-shadow 0.2s;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(44,53,80,0.07);
+  text-align: center;
+  gap: 6px;
+  overflow: hidden;
 }
 
 .respuesta-card:hover {
-  box-shadow: 0 4px 16px rgba(44, 53, 80, 0.15);
-  border-color: #3498db;
+  box-shadow: 0 4px 16px rgba(44,53,80,0.12);
+  border-color: #217dbb;
+  background: #f4faff;
 }
 
 .respuesta-card strong {
   color: #2c3550;
 }
 
-.respuesta-card ul {
-  padding-left: 18px;
-  margin: 0;
+.respuesta-card-titulo {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #2c3550;
+  text-align: center;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 90%;
+  overflow: hidden;
 }
 
-.respuesta-card li {
-  margin-bottom: 4px;
+.respuesta-card > div {
+  white-space: normal;
+  word-break: break-word;
+  max-width: 95%;
+  overflow: hidden;
+}
+
+/* Detalle visual de preguntas y respuestas */
+.preguntas-container {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pregunta {
+  border: 1.5px solid #3498db;
+  border-radius: 10px;
+  padding: 18px 20px;
+  background: #f9f9f9;
+  box-shadow: 0 1px 6px rgba(44, 53, 80, 0.06);
+  margin-bottom: 10px;
+}
+
+.pregunta-header h3 {
+  margin: 0 0 8px 0;
+  color: #2c3550;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.respuestas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.respuesta {
+  padding: 10px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 7px;
+  background-color: #fff;
   font-size: 1rem;
-  color: #444;
+  transition: background-color 0.3s, border-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.respuesta.seleccionada {
+  background-color: #eafaf1;
+  border-color: #27ae60;
+  color: #219653;
+  font-weight: 500;
+}
+
+.btn-retroceder {
+  margin-bottom: 18px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  display: block;
+  margin-left: auto;
+}
+
+.btn-retroceder:hover {
+  background-color: #217dbb;
+}
+
+@media (max-width: 900px) {
+  .ver-respuestas-root {
+    max-width: 98vw;
+    padding: 12px 4vw;
+  }
+  .respuesta-card {
+    max-width: 98vw;
+    width: 90vw;
+    min-width: unset;
+    min-height: 120px;
+    height: 100%;
+    padding: 12px 4vw;
+  }
+  .pregunta {
+    padding: 12px 4vw;
+  }
 }
 
 @media (max-width: 700px) {
   .tabla-respuestas {
-    flex-direction: column;
     gap: 16px;
+    justify-content: center;
   }
   .respuesta-card {
     min-width: unset;
     max-width: 100%;
+    width: 95vw;
+    padding: 12px 2vw;
+    min-height: 110px;
+    height: 100%;
+  }
+  .pregunta {
+    padding: 10px 2vw;
   }
 }

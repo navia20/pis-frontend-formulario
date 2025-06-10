@@ -5,16 +5,18 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
-import { RespuestasEstudiantes } from './RespuestasEstudiantes/RespuestasEstudiantes';
 import { Perfil } from '../Perfil/Perfil';
-import type { Usuario } from '../Perfil/Perfil';
 import { PanelInicio } from '../panel-incio/panel-inicio';
+import { ListaAsignaturas } from './ListaAsignaturas/ListaAsignaturas';
+import type { Usuario } from '../../types/usuario';
 
 export const DocentePanel: React.FC = () => {
   const [activeSection, setActiveSection] = useState('Inicio');
+  const [asignaturaSeleccionada, setAsignaturaSeleccionada] = useState<string | null>(null);
+  const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<{ alumnoId: string, formularioId: number } | null>(null);
   const navigate = useNavigate();
 
-  // Usuario de ejemplo (puedes reemplazarlo por el usuario real logueado)
+  // Usa el tipo Usuario para evitar errores de tipo
   const docenteUser: Usuario = {
     id: '2',
     nombres: 'María Elena',
@@ -29,6 +31,28 @@ export const DocentePanel: React.FC = () => {
   };
 
   const renderContent = () => {
+    if (alumnoSeleccionado) {
+      // Detalle de respuestas de un alumno
+      return (
+        <ListaAsignaturas.VerRespuestasAlumno
+          alumnoId={alumnoSeleccionado.alumnoId}
+          formularioId={alumnoSeleccionado.formularioId}
+          onBack={() => setAlumnoSeleccionado(null)}
+        />
+      );
+    }
+    if (asignaturaSeleccionada) {
+      // Lista de estudiantes de la asignatura
+      return (
+        <ListaAsignaturas.ListaEstudiantes
+          asignatura={asignaturaSeleccionada}
+          onBack={() => setAsignaturaSeleccionada(null)}
+          onSeleccionarAlumno={(alumnoId: string, formularioId: number) =>
+            setAlumnoSeleccionado({ alumnoId, formularioId })
+          }
+        />
+      );
+    }
     switch (activeSection) {
       case 'Inicio':
         return (
@@ -47,14 +71,17 @@ export const DocentePanel: React.FC = () => {
             usuario={docenteUser}
             editable={true}
             onGuardar={(usuarioActualizado: Usuario) => {
-              console.log('Usuario actualizado:', usuarioActualizado);
               // Aquí iría la lógica para actualizar el usuario en tu backend
+              console.log('Usuario actualizado:', usuarioActualizado);
             }}
           />
         );
       case 'Ver Respuestas Estudiantes':
-        // Aquí puedes pasar props si necesitas, por ejemplo para refrescar la corrección
-        return <RespuestasEstudiantes />;
+        return (
+          <ListaAsignaturas
+            onSeleccionarAsignatura={setAsignaturaSeleccionada}
+          />
+        );
       default:
         return <p>Selecciona una opción</p>;
     }

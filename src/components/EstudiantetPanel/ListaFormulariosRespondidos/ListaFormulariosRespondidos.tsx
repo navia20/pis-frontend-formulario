@@ -10,20 +10,19 @@ export const ListaFormulariosRespondidos: React.FC<{ onSeleccionar: (f: Formular
   }, []);
   const respondidos = formularios.filter(f => formulariosRespondidos.includes(f.id));
   return (
-    <div className="lista-formularios">
-      <h2>Formularios respondidos</h2>
-      {respondidos.length === 0 && <p>No has respondido ningún formulario.</p>}
-      <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+    <div className="alumno-respondidos-lista">
+      <h2 className="alumno-respondidos-titulo-lista">Formularios respondidos</h2>
+      {respondidos.length === 0 && <p className="alumno-respondidos-vacio">No has respondido ningún formulario.</p>}
+      <div className="alumno-respondidos-cards">
         {respondidos.map((formulario) => (
           <div
             key={formulario.id}
-            className="formulario-cuadro"
+            className="alumno-respondidos-cuadro"
             onClick={() => onSeleccionar(formulario)}
-            style={{ cursor: "pointer" }}
           >
-            <h3>{formulario.titulo}</h3>
-            <p><b>Asignatura:</b> {formulario.asignatura}</p>
-            <p><b>Fecha límite:</b> {formulario.fechaLimite ? new Date(formulario.fechaLimite).toLocaleDateString() : '-'}</p>
+            <div className="alumno-respondidos-titulo">{formulario.titulo}</div>
+            <div className="alumno-respondidos-info"><b>Asignatura:</b> {formulario.asignatura}</div>
+            <div className="alumno-respondidos-info"><b>Fecha límite:</b> {formulario.fechaLimite ? new Date(formulario.fechaLimite).toLocaleDateString() : '-'}</div>
           </div>
         ))}
       </div>

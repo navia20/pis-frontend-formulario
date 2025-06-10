@@ -4,38 +4,11 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import BookIcon from '@mui/icons-material/Book';
 import SchoolIcon from '@mui/icons-material/School';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-
-// Tipos generales
-interface UsuarioBase {
-  id: string;
-  nombres: string;
-  apellidos: string;
-  rut: string;
-  email: string;
-  tipo: 'docente' | 'alumno' | 'admin';
-}
-
-interface Admin extends UsuarioBase {
-  tipo: 'admin';
-  rol: string;
-}
-
-interface Docente extends UsuarioBase {
-  tipo: 'docente';
-}
-
-interface Alumno extends UsuarioBase {
-  tipo: 'alumno';
-  id_carrera?: string;
-  nombre_carrera?: string;
-  año_ingreso?: string;
-}
-
-export type Usuario = Admin | Docente | Alumno;
+import type { Usuario, Admin, Alumno } from '../../types/usuario';
 
 interface PerfilProps {
   usuario: Usuario;
-  editable?: boolean; // ya no se usará para edición
+  editable?: boolean;
   onGuardar?: (usuario: Usuario) => void;
 }
 

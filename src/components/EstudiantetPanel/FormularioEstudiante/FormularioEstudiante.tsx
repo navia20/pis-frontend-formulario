@@ -40,20 +40,20 @@ export const FormularioEstudiante: React.FC<FormularioEstudianteProps> = ({
   };
 
   return (
-    <div className="formulario-estudiante">
-      <h1>{formulario.titulo}</h1>
-      <div className="preguntas-container">
+    <div className="alumno-formulario-estudiante">
+      <h1 className="alumno-formulario-estudiante-titulo">{formulario.titulo}</h1>
+      <div className="alumno-formulario-preguntas-container">
         {formulario.preguntas.map((pregunta) => (
-          <div key={pregunta.id} className="pregunta">
-            <div className="pregunta-header">
+          <div key={pregunta.id} className="alumno-formulario-pregunta">
+            <div className="alumno-formulario-pregunta-header">
               <h3>Pregunta {pregunta.id}</h3>
             </div>
-            <p className="pregunta-texto">{pregunta.texto}</p>
-            <div className="respuestas">
+            <p className="alumno-formulario-pregunta-texto">{pregunta.texto}</p>
+            <div className="alumno-formulario-respuestas">
               {pregunta.respuestas.map((respuesta, index) => (
                 <label
                   key={index}
-                  className={`respuesta ${
+                  className={`alumno-formulario-respuesta ${
                     respuestasSeleccionadas[pregunta.id] === respuesta ? 'seleccionada' : ''
                   }`}
                 >
@@ -71,10 +71,10 @@ export const FormularioEstudiante: React.FC<FormularioEstudianteProps> = ({
           </div>
         ))}
       </div>
-      <button className="btn-enviar" onClick={manejarEnvioFormulario}>
+      <button className="alumno-formulario-btn-enviar" onClick={manejarEnvioFormulario}>
         Enviar
       </button>
-      {mensajeEnviado && <p className="mensaje-enviado">Formulario enviado con éxito</p>}
+      {mensajeEnviado && <p className="alumno-formulario-mensaje-enviado">Formulario enviado con éxito</p>}
     </div>
   );
 };

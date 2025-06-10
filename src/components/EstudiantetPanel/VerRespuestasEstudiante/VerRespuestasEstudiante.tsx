@@ -39,10 +39,10 @@ export const RespuestasEstudiante: React.FC<RespuestasEstudianteProps> = ({
   respuestasCorrectas = {},
 }) => {
   return (
-    <div className="cf-crear-formulario">
-      <div className="cf-header-row">
+    <div className="alumno-verrespuestas-formulario">
+      <div className="alumno-verrespuestas-header-row">
         <h1>Ver Formulario</h1>
-        <div className="cf-header-options">
+        <div className="alumno-verrespuestas-header-options">
           <div>
             <label>Asignatura:&nbsp;</label>
             <span>{formulario.asignatura || '-'}</span>
@@ -57,22 +57,22 @@ export const RespuestasEstudiante: React.FC<RespuestasEstudianteProps> = ({
           </div>
         </div>
       </div>
-      <div className="cf-titulo-container">
+      <div className="alumno-verrespuestas-titulo-container">
         <h2>{formulario.titulo}</h2>
       </div>
-      <div className="cf-preguntas-container">
+      <div className="alumno-verrespuestas-preguntas-container">
         {formulario.preguntas.map((pregunta) => (
-          <div key={pregunta.id} className="cf-pregunta">
-            <div className="cf-pregunta-header">
+          <div key={pregunta.id} className="alumno-verrespuestas-pregunta">
+            <div className="alumno-verrespuestas-pregunta-header">
               <h3>Pregunta {pregunta.id}</h3>
             </div>
             <textarea
               value={pregunta.texto}
               disabled
-              className="cf-textarea"
+              className="alumno-verrespuestas-textarea"
               style={{ background: "#f4f4f4", color: "#333" }}
             />
-            <div className="cf-respuestas">
+            <div className="alumno-verrespuestas-respuestas">
               {pregunta.respuestas.map((respuesta, index) => {
                 const seleccionada = respuestaAlumno.respuestas[pregunta.id] === respuesta;
                 let style: React.CSSProperties = {
@@ -115,7 +115,7 @@ export const RespuestasEstudiante: React.FC<RespuestasEstudianteProps> = ({
                       type="text"
                       value={respuesta}
                       disabled
-                      className="cf-respuesta-input"
+                      className="alumno-verrespuestas-respuesta-input"
                       style={style}
                     />
                     {mostrarCorrecion &&

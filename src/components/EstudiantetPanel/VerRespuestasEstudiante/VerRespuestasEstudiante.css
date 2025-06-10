@@ -1,20 +1,46 @@
-.respuesta-cuadro {
+.alumno-verrespuestas-formulario {
   margin-bottom: 24px;
   width: 100%;
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(44, 53, 80, 0.07);
+  padding: 24px 28px;
+  border: 1.5px solid #ddd;
 }
 
-.preguntas-container {
+.alumno-verrespuestas-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.alumno-verrespuestas-header-options {
+  display: flex;
+  gap: 16px;
+  font-size: 1rem;
+  color: #444;
+}
+
+.alumno-verrespuestas-titulo-container h2 {
+  margin: 0 0 18px 0;
+  color: #2c3550;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.alumno-verrespuestas-preguntas-container {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.pregunta {
-  border: 1px solid #ddd;
-  border-radius: 7px;
+.alumno-verrespuestas-pregunta {
+  border: 1.5px solid #ddd;
+  border-radius: 12px;
   padding: 18px 14px;
   background-color: #f9f9f9;
   box-sizing: border-box;
@@ -22,59 +48,65 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 12px;
+  box-shadow: 0 2px 8px rgba(44, 53, 80, 0.07);
 }
 
-.pregunta-header h3 {
+.alumno-verrespuestas-pregunta-header h3 {
   margin: 0;
   font-size: 1.1rem;
+  color: #2c3550;
 }
 
-.pregunta-texto {
+.alumno-verrespuestas-textarea {
   margin: 0;
   font-size: 1rem;
   color: #333;
   word-break: break-word;
+  border: none;
+  resize: none;
+  background: #f4f4f4;
 }
 
-.respuestas {
+.alumno-verrespuestas-respuestas {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.respuesta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.alumno-verrespuestas-respuesta-input {
+  width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+  border: 1.5px solid #ddd;
+  border-radius: 7px;
+  background-color: #fff;
   font-size: 1rem;
   word-break: break-word;
   transition: background-color 0.3s, border-color 0.3s;
   opacity: 0.7;
 }
 
-.respuesta.seleccionada {
+.alumno-verrespuestas-respuesta-input.seleccionada {
   background-color: #d4edda;
   border-color: #28a745;
   color: #155724;
   opacity: 1;
 }
 
-.respuesta-correcta {
+.alumno-verrespuestas-respuesta-correcta {
   background-color: #eafaf1 !important;
   border-color: #219653 !important;
   color: #219653 !important;
 }
 
-.respuesta-incorrecta {
+.alumno-verrespuestas-respuesta-incorrecta {
   background-color: #fdecea !important;
   border-color: #c0392b !important;
   color: #c0392b !important;
 }
 
-.respuesta input[type='radio'] {
-  display: none;
+@media (max-width: 700px) {
+  .alumno-verrespuestas-formulario {
+    padding: 14px 8px;
+    max-width: 100%;
+  }
 }

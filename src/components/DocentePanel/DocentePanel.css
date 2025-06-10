@@ -1,57 +1,53 @@
-/* Contenedor principal */
 .docente-panel {
   display: flex;
-  height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
-  width: 100vw; /* Asegura que ocupe todo el ancho de la ventana */
-  margin: 0; /* Elimina márgenes */
-  padding: 0; /* Elimina padding */
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
 }
 
-/* Barra lateral */
 .docente-sidebar {
-  width: 300px; /* Ancho de la barra lateral */
-  background-image: url('../../assets/images/celeste.jpg'); /* Fondo de la imagen */
-  background-size: cover; /* Escala la imagen para cubrir toda la barra */
-  background-position: center; /* Centra la imagen */
+  width: 300px;
+  background-image: url('../../assets/images/celeste.jpg');
+  background-size: cover;
+  background-position: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px 0;
-  height: 100vh; /* Asegura que la barra lateral cubra toda la altura */
-  position: fixed; /* Fija la barra lateral al margen izquierdo */
-  left: 0; /* Asegura que esté alineada al margen izquierdo */
-  top: 0; /* Asegura que comience desde la parte superior */
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
 }
 
-/* Contenedor del logo */
 .docente-logo-container {
   display: flex;
-  justify-content: space-between; /* Coloca los logos uno al lado del otro */
+  justify-content: space-between;
   align-items: center;
-  width: 100%; /* Asegura que ocupe todo el ancho de la barra lateral */
+  width: 100%;
   padding: 10px;
   margin-bottom: 20px;
 }
 
-.docente-logo {
+.logo.logo-left {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-image: url('../../assets/images/LogoUCN.png');
   background-size: cover;
   background-position: center;
 }
 
-.docente-logo-left {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%; /* Hace que el logo sea circular */
-  background-image: url('../../assets/images/LogoUCN.png');
-}
-
-.docente-logo-right {
+.logo.logo-right {
   width: 182px;
   height: 80px;
   background-image: url('../../assets/images/LogoEIC.png');
+  background-size: cover;
+  background-position: center;
 }
 
-/* Menú */
 .docente-menu {
   list-style: none;
   padding: 0;
@@ -60,7 +56,7 @@
 
 .docente-menu li {
   display: flex;
-  align-items: center; /* Alinea el ícono y el texto verticalmente */
+  align-items: center;
   padding: 15px 20px;
   color: white;
   cursor: pointer;
@@ -73,12 +69,11 @@
 }
 
 .docente-menu-icon {
-  margin-right: 10px; /* Espacio entre el ícono y el texto */
-  font-size: 1.5rem; /* Tamaño del ícono */
-  color: white; /* Color del ícono */
+  margin-right: 10px;
+  font-size: 1.5rem;
+  color: white;
 }
 
-/* Botón de cerrar sesión */
 .docente-logout {
   margin-top: auto;
   border-top: 1px solid white;
@@ -93,12 +88,122 @@
   background-color: #c0392b;
 }
 
-/* Contenedor de contenido */
 .docente-content {
-  margin-left: 300px; /* Deja espacio para la barra lateral */
-  flex: 1; /* Hace que el contenido ocupe todo el espacio restante */
+  margin-left: 300px;
+  flex: 1;
   padding: 20px;
-  background-color: #f4f4f9; /* Fondo blanco */
-  height: 100vh; /* Asegura que cubra toda la altura */
-  overflow-y: auto; /* Permite desplazamiento si el contenido es muy largo */
+  background-color: #f4f4f9;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* --- Puedes dejar el resto de estilos para los cuadros y preguntas --- */
+.lista-asignaturas, .lista-estudiantes, .ver-respuestas-alumno {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.lista-asignaturas-cards, .lista-estudiantes-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+
+.asignatura-cuadro, .estudiante-cuadro {
+  width: 220px;
+  height: 120px;
+  border: 2px solid #3498db;
+  border-radius: 12px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.2s;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(44, 53, 80, 0.07);
+}
+
+.asignatura-cuadro:hover, .estudiante-cuadro:hover {
+  background-color: #e8f4fc;
+  box-shadow: 0 4px 8px rgba(44,53,80,0.12);
+  border-color: #217dbb;
+}
+
+.btn-retroceder {
+  margin-bottom: 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-retroceder:hover {
+  background-color: #2980b9;
+}
+
+.preguntas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pregunta {
+  border: 2px solid #3498db;
+  border-radius: 12px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(44, 53, 80, 0.07);
+}
+
+.pregunta-header h3 {
+  margin: 0;
+  color: #2c3550;
+}
+
+.pregunta-texto {
+  margin: 0 0 10px 0;
+}
+
+.respuestas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.respuesta {
+  padding: 10px;
+  border: 1.5px solid #ddd;
+  border-radius: 7px;
+  background-color: #fff;
+  font-size: 1rem;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.respuesta.seleccionada {
+  background-color: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.respuesta.respuesta-correcta {
+  background-color: #eafaf1 !important;
+  border-color: #219653 !important;
+  color: #219653 !important;
+}
+
+.respuesta.respuesta-incorrecta {
+  background-color: #fdecea !important;
+  border-color: #c0392b !important;
+  color: #c0392b !important;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { asignaturaService } from '../../../services/asignaturaService';
+import './AgregarAsignatura.css';
 
 // Componente para agregar una nueva asignatura
 export const AgregarAsignatura: React.FC = () => {
@@ -9,7 +10,6 @@ export const AgregarAsignatura: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Puedes agregar más campos según tu backend (ej: id_carrera, id_docentes)
       await asignaturaService.crearAsignatura({ nombre, id_carrera: 'carrera1', id_docentes: [] });
       setMensaje('Asignatura agregada');
       setNombre('');
@@ -19,7 +19,7 @@ export const AgregarAsignatura: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="agregar-asignatura-form">
       <h2>Agregar Asignatura</h2>
       <input
         value={nombre}
