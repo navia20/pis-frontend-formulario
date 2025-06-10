@@ -1,5 +1,5 @@
 import React from "react";
-import "./RespuestasEstudiante.css";
+import "./VerRespuestasEstudiante.css";
 
 interface Pregunta {
   id: number;
