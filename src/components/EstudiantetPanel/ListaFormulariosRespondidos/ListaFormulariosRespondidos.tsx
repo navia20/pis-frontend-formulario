@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { formularioEstudianteService } from '../../../services/formularioEstudianteService';
-import { FormularioAlumno } from '../../../types/formularioAlumno';
+import { FormularioAlumno } from '../../../types/FormularioAlumno';
 import './ListaFormulariosRespondidos.css';
 
 export const ListaFormulariosRespondidos: React.FC<{ onSeleccionar: (f: FormularioAlumno) => void; formulariosRespondidos: number[] }> = ({ onSeleccionar, formulariosRespondidos }) => {

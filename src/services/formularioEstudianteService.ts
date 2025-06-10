@@ -1,4 +1,4 @@
-import { FormularioAlumno } from '../types/FormularioAlumno';
+import { FormularioAlumno } from '../types/formularioAlumno';
 
 const mockFormularios: FormularioAlumno[] = [
   {
