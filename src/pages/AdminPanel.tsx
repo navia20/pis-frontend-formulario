@@ -6,13 +6,22 @@ import SearchIcon from '@mui/icons-material/Search';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import EditSquareIcon from '@mui/icons-material/EditSquare';
-import { CrearFormulario } from './CrearFormulario/CrearFormulario';
-import { CuadroFormularios } from './CuadroFormularios/CuadroFormularios';
-import { Perfil } from '../Perfil/Perfil';
-import type { Usuario } from '../Perfil/Perfil';
+import { CrearFormulario } from '../components/AdminPanel/CrearFormulario/CrearFormulario';
+import { CuadroFormularios } from '../components/AdminPanel/CuadroFormularios/CuadroFormularios';
+import { Perfil } from '../components/Perfil/Perfil';
+import type { Usuario } from '../components/Perfil/Perfil';
 import { useNavigate } from 'react-router-dom';
-import { PanelInicio } from '../panel-incio/panel-inicio';
+import { PanelInicio } from '../components/panel-incio/panel-inicio';
+import { encuestaService } from '../services/encuestaService';
 
+// Importación de los nuevos componentes del panel de administración
+import { CrearUsuario } from '../components/AdminPanel/CrearUsuario/CrearUsuario';
+import { VerRespuestas } from '../components/AdminPanel/VerRespuestas/VerRespuestas';
+import { AgregarAsignatura } from '../components/AdminPanel/AgregarAsignatura/AgregarAsignatura';
+import { DesignarAsignaturaEstudiante } from '../components/AdminPanel/DesignarAsignaturaEstudiante/DesignarAsignaturaEstudiante';
+import { DesignarAsignaturaDocente } from '../components/AdminPanel/DesignarAsignaturaDocente/DesignarAsignaturaDocente';
+
+// TODO: Mover estos tipos a src/types/formulario.ts si se usan en más archivos
 interface Pregunta {
   id: number;
   texto: string;
@@ -34,42 +43,70 @@ export const AdminPanel: React.FC = () => {
   const [formularioSeleccionado, setFormularioSeleccionado] = useState<Formulario | null>(null);
   const [formularioSoloLectura, setFormularioSoloLectura] = useState<Formulario | null>(null);
 
-  // Estado global de formularios
-  const [formularios, setFormularios] = useState<Formulario[]>(() => {
-    const data = localStorage.getItem('formularios');
-    return data ? JSON.parse(data) : [];
-  });
-
-  // Sincroniza formularios con localStorage
-  useEffect(() => {
-    localStorage.setItem('formularios', JSON.stringify(formularios));
-  }, [formularios]);
+  const [formularios, setFormularios] = useState<Formulario[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
+
+  // Cargar formularios desde el service al montar
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    encuestaService.getEncuestas()
+      .then((data) => {
+        setFormularios(
+          data.map((e) => ({
+            id: Number(e.id),
+            titulo: e.titulo,
+            preguntas: [], // TODO: Mapear preguntas si el backend las entrega
+            asignatura: e.id_asignatura,
+            enviado: false,
+            editandoTitulo: false,
+          }))
+        );
+      })
+      .catch(() => setError('Error al cargar los formularios'))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleLogout = () => {
     navigate('/');
   };
 
   // Guardar formulario (nuevo o editado)
-  const handleGuardarFormulario = (formulario: Formulario) => {
-    if (formulario.id && formularios.some(f => f.id === formulario.id)) {
-      setFormularios((prev) =>
-        prev.map((f) => (f.id === formulario.id ? { ...formulario } : f))
-      );
-    } else {
-      setFormularios((prev) => [
-        ...prev,
-        {
+  const handleGuardarFormulario = async (formulario: Formulario) => {
+    try {
+      let nuevoFormulario = formulario;
+      if (formulario.id && formularios.some(f => f.id === formulario.id)) {
+        // Actualizar
+        await encuestaService.updateEncuesta(formulario.id.toString(), {
+          titulo: formulario.titulo,
+          // ...otros campos que correspondan
+        });
+        setFormularios((prev) =>
+          prev.map((f) => (f.id === formulario.id ? { ...formulario } : f))
+        );
+      } else {
+        // Crear
+        const creado = await encuestaService.createEncuesta({
+          titulo: formulario.titulo,
+          descripcion: '', // TODO: Ajustar según tu modelo
+          id_asignatura: formulario.asignatura || '',
+          fecha_creacion: new Date().toISOString(),
+          fecha_termino: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+        nuevoFormulario = {
           ...formulario,
-          id: prev.length ? Math.max(...prev.map((f) => f.id)) + 1 : 1,
-          asignatura: null,
-          enviado: false,
-          editandoTitulo: formulario.editandoTitulo ?? false,
-        },
-      ]);
+          id: Number(creado.id),
+          asignatura: creado.id_asignatura,
+        };
+        setFormularios((prev) => [...prev, nuevoFormulario]);
+      }
+      setFormularioSeleccionado(null);
+    } catch (e) {
+      setError('Error al guardar el formulario');
     }
-    setFormularioSeleccionado(null);
   };
 
   // Usuario de ejemplo (puedes reemplazarlo por el usuario real logueado)
@@ -83,9 +120,10 @@ export const AdminPanel: React.FC = () => {
     rol: 'Administrador Principal'
   };
 
+  // Render de contenido principal
   const renderContent = () => {
-    // Diagnóstico: muestra el valor actual de activeSection
-    // console.log('activeSection:', activeSection);
+    if (loading) return <div className="loading">Cargando...</div>;
+    if (error) return <div className="error">{error}</div>;
 
     if (formularioSoloLectura) {
       return (
@@ -128,12 +166,12 @@ export const AdminPanel: React.FC = () => {
         <CuadroFormularios
           formularios={formularios}
           setFormularios={setFormularios}
-          setFormularioSeleccionado={setFormularioSeleccionado}
           setFormularioSoloLectura={setFormularioSoloLectura}
         />
       );
     }
 
+    // Secciones del panel de administración
     switch (activeSection) {
       case 'Inicio':
         return <PanelInicio usuario={{
@@ -144,7 +182,7 @@ export const AdminPanel: React.FC = () => {
           total_usuarios: 120,
           total_docentes: 15,
           total_alumnos: 105,
-        }} />
+        }} />;
       case 'Perfil':
         return (
           <Perfil
@@ -152,20 +190,20 @@ export const AdminPanel: React.FC = () => {
             editable={true}
             onGuardar={(usuarioActualizado: Usuario) => {
               console.log('Usuario actualizado:', usuarioActualizado);
-              // Aquí iría la lógica para actualizar el usuario en tu backend
+              // TODO: Llamar a backend para actualizar usuario
             }}
           />
         );
       case 'Ver Respuestas':
-        return <p>Esta es la sección de Ver Respuestas</p>;
+        return <VerRespuestas />;
       case 'Agregar Asignatura':
-        return <p>Esta es la sección de Agregar Asignatura</p>;
+        return <AgregarAsignatura />;
       case 'Designar Asignatura en Estudiante':
-        return <p>Esta es la sección de Designar Asignatura en Estudiante</p>;
+        return <DesignarAsignaturaEstudiante />;
       case 'Designar Asignatura en Docente':
-        return <p>Esta es la sección de Designar Asignatura en Docente</p>;
+        return <DesignarAsignaturaDocente />;
       case 'Crear Usuario':
-        return <p>Esta es la sección de Crear Usuario</p>;
+        return <CrearUsuario />;
       case 'Cerrar Sesión':
         return <p>Has cerrado sesión</p>;
       default:

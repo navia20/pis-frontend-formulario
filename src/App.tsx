@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LoginForm } from './components/LoginForm/LoginForm';
-import { AdminPanel } from './components/AdminPanel/AdminPanel';
+import { AdminPanel } from './pages/AdminPanel';
 import { EstudiantePanel } from './components/EstudiantetPanel/EstudiantePanel';
 import { DocentePanel } from './components/DocentePanel/DocentePanel';
 

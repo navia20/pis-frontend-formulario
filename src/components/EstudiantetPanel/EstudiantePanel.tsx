@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { FormularioEstudiante } from './FormularioEstudiante/FormularioEstudiante';
 import { Perfil } from '../Perfil/Perfil';
 import { PanelInicio } from '../panel-incio/panel-inicio';
-import { RespuestasEstudiante } from './RespuestasEstudiante/RespuestasEstudiante';
+import { RespuestasEstudiante } from './VerRespuestasEstudiante/VerRespuestasEstudiante';
 
 interface Alumno {
   id: string;

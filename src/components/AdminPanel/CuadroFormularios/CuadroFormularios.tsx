@@ -1,54 +1,35 @@
 import React, { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { CrearFormulario } from '../CrearFormulario/CrearFormulario';
-
-interface Pregunta {
-  id: number;
-  texto: string;
-  respuestas: string[];
-  editando: boolean;
-  respuestaCorrecta?: number;
-}
-
-interface Formulario {
-  id: number;
-  titulo: string;
-  preguntas: Pregunta[];
-  asignatura?: string | null;
-  fechaLimite?: string | null;
-  enviado?: boolean;
-  editandoTitulo?: boolean;
-}
+import { FormularioCard } from './FormularioCard/FormularioCard';
+import type { Formulario } from '../../../types/formulario';
+import './CuadroFormularios.css';
 
 interface CuadroFormulariosProps {
   formularios: Formulario[];
   setFormularios: React.Dispatch<React.SetStateAction<Formulario[]>>;
-  setFormularioSeleccionado: (formulario: Formulario | null) => void;
   setFormularioSoloLectura: (formulario: Formulario | null) => void;
 }
 
 export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
   formularios,
   setFormularios,
-  setFormularioSeleccionado,
   setFormularioSoloLectura,
 }) => {
   const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
   const [formularioEnEdicion, setFormularioEnEdicion] = useState<Formulario | null>(null);
 
-  // Guardar formulario (nuevo o editado)
   const handleGuardarFormulario = (formulario: Formulario) => {
     if (formulario.id && formularios.some(f => f.id === formulario.id)) {
-      setFormularios((prev) =>
-        prev.map((f) => (f.id === formulario.id ? { ...formulario } : f))
+      setFormularios(prev =>
+        prev.map(f => (f.id === formulario.id ? { ...formulario } : f))
       );
     } else {
-      setFormularios((prev) => [
+      setFormularios(prev => [
         ...prev,
         {
           ...formulario,
-          id: prev.length ? Math.max(...prev.map((f) => f.id)) + 1 : 1,
+          id: prev.length ? Math.max(...prev.map(f => f.id)) + 1 : 1,
           asignatura: formulario.asignatura || null,
           fechaLimite: formulario.fechaLimite || null,
           enviado: false,
@@ -59,13 +40,12 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
     setFormularioEnEdicion(null);
   };
 
-  // Eliminar formulario
   const handleEliminarFormulario = (id: number) => {
-    setFormularios((prev) => prev.filter((f) => f.id !== id));
+    setFormularios(prev => prev.filter(f => f.id !== id));
     setMenuAbierto(null);
+    // TODO: Llamar a backend para eliminar si existe endpoint
   };
 
-  // Validar si el formulario está listo para enviar
   const puedeEnviarFormulario = (formulario: Formulario) => {
     if (!formulario.titulo.trim()) return false;
     if (formulario.editandoTitulo) return false;
@@ -79,20 +59,16 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
     return true;
   };
 
-  // Enviar a asignatura (simulado)
   const handleEnviarAsignatura = (id: number) => {
-    const formulario = formularios.find((f) => f.id === id);
+    const formulario = formularios.find(f => f.id === id);
     if (!formulario || !puedeEnviarFormulario(formulario)) return;
-    // Aquí podrías hacer la petición a la API para guardar definitivamente el formulario
-    setFormularios((prev) =>
-      prev.map((f) =>
-        f.id === id ? { ...f, enviado: true } : f
-      )
+    // TODO: Llamar a backend para marcar como enviado
+    setFormularios(prev =>
+      prev.map(f => (f.id === id ? { ...f, enviado: true } : f))
     );
     setMenuAbierto(null);
   };
 
-  // Render
   if (formularioEnEdicion) {
     return (
       <div>
@@ -113,76 +89,27 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
 
   return (
     <div className="admin-formularios-lista">
-      {formularios.map((formulario) => (
-        <div key={formulario.id} className="admin-formulario-cuadro">
-          <div className="admin-formulario-titulo">{formulario.titulo}</div>
-          <div className="admin-formulario-info">
-            {formulario.asignatura && (
-              <span className="admin-formulario-asignatura">
-                {formulario.asignatura}
-              </span>
-            )}
-            {formulario.fechaLimite && (
-              <span className="admin-formulario-fecha">
-                Límite: {new Date(formulario.fechaLimite).toLocaleDateString()}
-              </span>
-            )}
-          </div>
-          <button
-            className="admin-formulario-menu-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuAbierto(menuAbierto === formulario.id ? null : formulario.id);
-            }}
-          >
-            <MoreVertIcon />
-          </button>
-          {menuAbierto === formulario.id && (
-            <div className="admin-formulario-menu">
-              <button
-                onClick={() => {
-                  setFormularioEnEdicion({
-                    ...formulario,
-                    editandoTitulo: formulario.editandoTitulo ?? false,
-                  });
-                  setMenuAbierto(null);
-                }}
-                disabled={formulario.enviado}
-              >
-                Editar
-              </button>
-              <button onClick={() => handleEliminarFormulario(formulario.id)}>
-                Eliminar
-              </button>
-              {formulario.asignatura && (
-                <button
-                  onClick={() => handleEnviarAsignatura(formulario.id)}
-                  disabled={formulario.enviado || !puedeEnviarFormulario(formulario)}
-                  title={
-                    !puedeEnviarFormulario(formulario)
-                      ? 'Debes guardar el título, asignatura, fecha límite y todas las preguntas antes de enviar'
-                      : undefined
-                  }
-                >
-                  Enviar a Asignatura
-                </button>
-              )}
-              {formulario.enviado && (
-                <button
-                  onClick={() => {
-                    setFormularioSoloLectura(formulario);
-                    setMenuAbierto(null);
-                  }}
-                >
-                  Ver Formulario
-                </button>
-              )}
-            </div>
-          )}
-          {formulario.enviado && (
-            <div className="admin-formulario-enviado">Enviado</div>
-          )}
-        </div>
+      {formularios.map(formulario => (
+        <FormularioCard
+          key={formulario.id}
+          formulario={formulario}
+          menuAbierto={menuAbierto}
+          setMenuAbierto={setMenuAbierto}
+          onEditar={() => {
+            setFormularioEnEdicion({
+              ...formulario,
+              editandoTitulo: formulario.editandoTitulo ?? false,
+            });
+            setMenuAbierto(null);
+          }}
+          onEliminar={() => handleEliminarFormulario(formulario.id)}
+          onEnviar={() => handleEnviarAsignatura(formulario.id)}
+          onVer={() => {
+            setFormularioSoloLectura(formulario);
+            setMenuAbierto(null);
+          }}
+          puedeEnviar={puedeEnviarFormulario(formulario)}
+        />
       ))}
       <div
         className="admin-formulario-cuadro admin-formulario-cuadro-nuevo"
@@ -197,6 +124,7 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
             editandoTitulo: true,
           })
         }
+        aria-label="Crear nuevo formulario"
       >
         <AddIcon style={{ fontSize: 48 }} />
       </div>

@@ -1,30 +1,23 @@
 import React, { useState } from 'react';
 import './CrearFormulario.css';
-import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
-import AddIcon from '@mui/icons-material/Add';
+import type { Pregunta, Formulario } from '../../../types/formulario';
+import { PreguntaEditor } from './PreguntaEditor/PreguntaEditor';
 
-interface Pregunta {
-  id: number;
-  texto: string;
-  respuestas: string[];
-  editando: boolean;
-  respuestaCorrecta?: number;
-}
+/**
+ * Componente para crear o editar un formulario de preguntas.
+ * - Compatible con integración backend (estructura de datos limpia).
+ * - Usa subcomponente PreguntaEditor para cada pregunta.
+ * - Buenas prácticas: hooks al inicio, props tipados, validaciones claras.
+ * - Si soloLectura=true, todo es solo visualización.
+ */
 
 interface CrearFormularioProps {
-  formulario: {
-    id: number;
-    titulo: string;
-    preguntas: Pregunta[];
-    asignatura?: string | null;
-    fechaLimite?: string | null;
-    enviado?: boolean;
-    editandoTitulo?: boolean;
-  };
-  setFormulario: React.Dispatch<React.SetStateAction<any>>;
-  onGuardar: (formulario: any) => void;
+  formulario: Formulario | null;
+  setFormulario: React.Dispatch<React.SetStateAction<Formulario | null>>;
+  onGuardar: (formulario: Formulario) => void;
   soloLectura?: boolean;
 }
 
@@ -34,16 +27,21 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   onGuardar,
   soloLectura = false,
 }) => {
-  const { titulo, preguntas, asignatura, fechaLimite } = formulario;
-
+  // Hooks siempre al inicio
   const [editandoTitulo, setEditandoTitulo] = useState(
-    formulario.editandoTitulo ?? !soloLectura
+    formulario?.editandoTitulo ?? !soloLectura
   );
   const [errorTitulo, setErrorTitulo] = useState('');
   const [errorPregunta, setErrorPregunta] = useState<{ [id: number]: string }>({});
   const [errorFormulario, setErrorFormulario] = useState('');
 
-  // Opciones de asignatura (simulado)
+  // Validación: si no hay formulario, no renderizar nada
+  if (!formulario) return null;
+
+  // Desestructuración para claridad
+  const { titulo, preguntas, asignatura, fechaLimite } = formulario;
+
+  // Opciones de asignatura (simulado, reemplazar por fetch si es backend real)
   const asignaturasDisponibles = [
     'Matemáticas',
     'Lenguaje',
@@ -52,7 +50,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     'Inglés',
   ];
 
-  // NUEVO: Actualizar fecha límite
+  // Actualiza la fecha límite del formulario
   const actualizarFechaLimite = (nuevaFecha: string) => {
     if (soloLectura) return;
     setFormulario({
@@ -61,7 +59,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  // NUEVO: Actualizar asignatura
+  // Actualiza la asignatura seleccionada
   const actualizarAsignatura = (nuevaAsignatura: string) => {
     if (soloLectura) return;
     setFormulario({
@@ -115,7 +113,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  // Selecciona la respuesta correcta
+  // Selecciona la respuesta correcta de una pregunta
   const seleccionarRespuestaCorrecta = (id: number, index: number) => {
     if (soloLectura) return;
     setFormulario({
@@ -128,7 +126,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  // Agrega una alternativa a una pregunta
+  // Agrega una alternativa/respuesta a una pregunta
   const agregarAlternativa = (id: number) => {
     if (soloLectura) return;
     setFormulario({
@@ -141,7 +139,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  // Guarda una pregunta (deja de estar en modo edición)
+  // Guarda una pregunta (valida antes)
   const guardarPregunta = (id: number) => {
     if (soloLectura) return;
     const pregunta = preguntas.find((p: Pregunta) => p.id === id);
@@ -168,7 +166,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  // Permite editar una pregunta
+  // Permite editar una pregunta ya guardada
   const editarPregunta = (id: number) => {
     if (soloLectura) return;
     setFormulario({
@@ -179,7 +177,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  // Elimina una pregunta y reordena los IDs
+  // Elimina una pregunta del formulario
   const eliminarPregunta = (id: number) => {
     if (soloLectura) return;
     setFormulario({
@@ -200,7 +198,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  // Guarda el título (deja de estar en modo edición)
+  // Guarda el título (valida antes)
   const guardarTitulo = () => {
     if (soloLectura) return;
     if (!titulo.trim()) {
@@ -225,7 +223,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     });
   };
 
-  // Guarda el formulario completo y vuelve a la lista de formularios
+  // Guarda el formulario completo (valida antes)
   const guardarFormularioCompleto = () => {
     if (soloLectura) return;
     if (!titulo.trim()) {
@@ -245,11 +243,13 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
       return;
     }
     setErrorFormulario('');
+    // TODO: Aquí puedes hacer la llamada al backend para guardar el formulario
     onGuardar(formulario);
   };
 
   return (
     <div className="cf-crear-formulario">
+      {/* Header con asignatura y fecha */}
       <div className="cf-header-row">
         <h1>{soloLectura ? 'Ver Formulario' : 'Crear Formulario'}</h1>
         <div className="cf-header-options">
@@ -285,6 +285,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
           </div>
         </div>
       </div>
+      {/* Título editable */}
       <div className="cf-titulo-container">
         {editandoTitulo && !soloLectura ? (
           <input
@@ -308,111 +309,25 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
         )}
       </div>
       {errorTitulo && <div style={{ color: 'red', marginBottom: 10 }}>{errorTitulo}</div>}
+      {/* Lista de preguntas */}
       <div className="cf-preguntas-container">
         {preguntas.map((pregunta: Pregunta) => (
-          <div key={pregunta.id} className="cf-pregunta">
-            <div className="cf-pregunta-header">
-              <h3>Pregunta {pregunta.id}</h3>
-              {!soloLectura && (
-                <button
-                  className="cf-btn-eliminar"
-                  onClick={() => eliminarPregunta(pregunta.id)}
-                >
-                  <DeleteIcon />
-                </button>
-              )}
-            </div>
-            <textarea
-              value={pregunta.texto}
-              onChange={(e) => actualizarPregunta(pregunta.id, e.target.value)}
-              disabled={!pregunta.editando || soloLectura}
-              placeholder="Escribe la pregunta aquí..."
-              className="cf-textarea"
-            />
-            <div className="cf-respuestas">
-              {pregunta.respuestas.map((respuesta, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginBottom: 4,
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={respuesta}
-                    onChange={(e) =>
-                      actualizarRespuesta(pregunta.id, index, e.target.value)
-                    }
-                    placeholder={`Respuesta ${index + 1}`}
-                    disabled={!pregunta.editando || soloLectura}
-                    style={{
-                      border:
-                        pregunta.respuestaCorrecta === index
-                          ? '2px solid #27ae60'
-                          : undefined,
-                      background:
-                        pregunta.respuestaCorrecta === index
-                          ? '#eafaf1'
-                          : undefined,
-                      marginRight: 8,
-                      flex: 1,
-                    }}
-                    onClick={() =>
-                      pregunta.editando && !soloLectura
-                        ? seleccionarRespuestaCorrecta(pregunta.id, index)
-                        : undefined
-                    }
-                  />
-                  {pregunta.editando && !soloLectura && (
-                    <input
-                      type="radio"
-                      name={`respuesta-correcta-${pregunta.id}`}
-                      checked={pregunta.respuestaCorrecta === index}
-                      onChange={() =>
-                        seleccionarRespuestaCorrecta(pregunta.id, index)
-                      }
-                      style={{ accentColor: '#27ae60', marginLeft: 4 }}
-                    />
-                  )}
-                </div>
-              ))}
-              {pregunta.editando && !soloLectura && (
-                <button
-                  className="cf-btn-agregar-alternativa"
-                  onClick={() => agregarAlternativa(pregunta.id)}
-                >
-                  <AddIcon /> Agregar Alternativa
-                </button>
-              )}
-            </div>
-            <div className="cf-pregunta-actions">
-              {!soloLectura &&
-                (pregunta.editando ? (
-                  <button
-                    className="cf-btn-guardar"
-                    onClick={() => guardarPregunta(pregunta.id)}
-                  >
-                    <SaveIcon />
-                  </button>
-                ) : (
-                  <button
-                    className="cf-btn-editar"
-                    onClick={() => editarPregunta(pregunta.id)}
-                  >
-                    <EditIcon />
-                  </button>
-                ))}
-            </div>
-            {errorPregunta[pregunta.id] && (
-              <div style={{ color: 'red', marginTop: 5 }}>
-                {errorPregunta[pregunta.id]}
-              </div>
-            )}
-          </div>
+          <PreguntaEditor
+            key={pregunta.id}
+            pregunta={pregunta}
+            soloLectura={soloLectura}
+            error={errorPregunta[pregunta.id]}
+            actualizarPregunta={actualizarPregunta}
+            actualizarRespuesta={actualizarRespuesta}
+            seleccionarRespuestaCorrecta={seleccionarRespuestaCorrecta}
+            agregarAlternativa={agregarAlternativa}
+            guardarPregunta={guardarPregunta}
+            editarPregunta={editarPregunta}
+            eliminarPregunta={eliminarPregunta}
+          />
         ))}
       </div>
+      {/* Acciones para agregar pregunta y guardar formulario */}
       {!soloLectura && (
         <>
           <div className="cf-btn-agregar-container">

@@ -1,0 +1,92 @@
+.admin-panel {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+/* Barra lateral */
+.sidebar {
+  width: 300px;
+  background-image: url('../assets/images/celeste.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  background-size: cover;
+  background-position: center;
+}
+
+.logo-left {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-image: url('../assets/images/LogoUCN.png');
+}
+
+.logo-right {
+  width: 182px;
+  height: 80px;
+  background-image: url('../assets/images/LogoEIC.png');
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+.menu li {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.3s;
+}
+
+.menu li:hover {
+  background-color: #2980b9;
+}
+
+.logout {
+  margin-top: auto;
+  border-top: 1px solid white;
+  padding-top: 15px;
+}
+
+/* Contenedor de contenido */
+.content {
+  margin-left: 300px;
+  flex: 1;
+  padding: 20px;
+  background-color: #f4f4f9;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.menu-icon {
+  margin-right: 10px;
+  font-size: 1.5rem;
+  color: white;
+}
