@@ -4,48 +4,115 @@
 //import axios from 'axios';
 //const API_URL = 'http://localhost:3000'; // Cambia según tu backend
 
-// --- MOCK DATA ---
-const mockEstudiantes = [
-  { id: 'alumno1', nombre: 'Juan Pérez', asignaturas: ['1'] },
-  { id: 'alumno2', nombre: 'Ana Gómez', asignaturas: ['2'] },
+// Mock de alumnos con estructura completa tipo Alumno
+const mockAlumnos = [
+  {
+    id: '1',
+    nombres: 'Juan',
+    apellidos: 'Pérez',
+    rut: '11.111.111-1',
+    email: 'juan.perez@ucn.cl',
+    id_carrera: 'ING-SOFT',
+    año_ingreso: 2022,
+    activo: true,
+  },
+  {
+    id: '2',
+    nombres: 'María',
+    apellidos: 'Gómez',
+    rut: '22.222.222-2',
+    email: 'maria.gomez@ucn.cl',
+    id_carrera: 'ING-CIVIL',
+    año_ingreso: 2023,
+    activo: true,
+  },
+  // ...agrega más alumnos si quieres
 ];
 
+// Mock de docentes con estructura completa tipo Docente
 const mockDocentes = [
-  { id: 'docente1', nombre: 'Carlos Ruiz', asignaturas: ['1'] },
-  { id: 'docente2', nombre: 'María Soto', asignaturas: [] },
+  {
+    id: 'd1',
+    nombres: 'Ana',
+    apellidos: 'García',
+    rut: '11.111.111-1',
+    email: 'ana.garcia@ucn.cl',
+    activo: true,
+  },
+  {
+    id: 'd2',
+    nombres: 'Luis',
+    apellidos: 'Martínez',
+    rut: '22.222.222-2',
+    email: 'luis.martinez@ucn.cl',
+    activo: true,
+  },
+  // ...agrega más docentes si quieres
 ];
 
-// --- SERVICE ---
+// Mock de asignaturas con estructura completa tipo Asignatura
+const mockAsignaturas = [
+  {
+    id: 'a1',
+    nombre: 'Matemáticas I',
+    id_carrera: 'ING-SOFT',
+    id_docentes: [] as string[],
+  },
+  {
+    id: 'a2',
+    nombre: 'Historia Universal',
+    id_carrera: 'ING-CIVIL',
+    id_docentes: [] as string[],
+  },
+  // ...agrega más asignaturas si quieres
+];
+
+// Mock de asignaciones (solo para simular)
+let asignaciones = [] as { estudianteId: string; asignaturaId: string }[];
+
+// Mock de asignaciones a docentes (solo para simular)
+let asignacionesDocentes = [] as { docenteId: string; asignaturaId: string }[];
+
 export const designacionService = {
-  // Obtener todos los estudiantes
+  // Devuelve todos los alumnos con estructura completa
   getEstudiantes: async () => {
-    // return (await axios.get(`${API_URL}/alumnos`)).data; // <-- Llamada real
-    return Promise.resolve(mockEstudiantes); // <-- Mock temporal
+    return Promise.resolve(mockAlumnos);
   },
 
-  // Obtener todos los docentes
+  // Devuelve docentes con estructura completa
   getDocentes: async () => {
-    // return (await axios.get(`${API_URL}/docentes`)).data; // <-- Llamada real
-    return Promise.resolve(mockDocentes); // <-- Mock temporal
+    return Promise.resolve(mockDocentes);
   },
 
-  // Designar asignatura a estudiante
+  // Devuelve asignaturas con estructura completa
+  getAsignaturas: async () => {
+    return Promise.resolve(mockAsignaturas);
+  },
+
+  // Asignar una asignatura a un solo estudiante
   asignarAsignaturaEstudiante: async (estudianteId: string, asignaturaId: string) => {
-    // return (await axios.patch(`${API_URL}/alumnos/${estudianteId}`, { asignaturas: [asignaturaId] })).data; // <-- Llamada real
-    const estudiante = mockEstudiantes.find(e => e.id === estudianteId);
-    if (estudiante && !estudiante.asignaturas.includes(asignaturaId)) {
-      estudiante.asignaturas.push(asignaturaId);
-    }
-    return Promise.resolve(estudiante); // <-- Mock temporal
+    asignaciones.push({ estudianteId, asignaturaId });
+    return Promise.resolve();
   },
 
-  // Designar asignatura a docente
-  asignarAsignaturaDocente: async (docenteId: string, asignaturaId: string) => {
-    // return (await axios.patch(`${API_URL}/asignaturas/${asignaturaId}/add-docente`, { docenteId })).data; // <-- Llamada real
-    const docente = mockDocentes.find(d => d.id === docenteId);
-    if (docente && !docente.asignaturas.includes(asignaturaId)) {
-      docente.asignaturas.push(asignaturaId);
+  // Asignar una asignatura a varios estudiantes (masivo)
+  asignarAsignaturaEstudiantes: async (estudiantesIds: string[], asignaturaId: string) => {
+    estudiantesIds.forEach(id => {
+      asignaciones.push({ estudianteId: id, asignaturaId });
+    });
+    return Promise.resolve();
+  },
+
+  // Asignar una asignatura a un docente
+  asignarAsignaturaDocentes: async (docentesIds: string[], asignaturaId: string) => {
+  docentesIds.forEach(docenteId => {
+    const asignatura = mockAsignaturas.find(a => a.id === asignaturaId);
+    if (asignatura && !asignatura.id_docentes.includes(docenteId)) {
+      asignatura.id_docentes.push(docenteId);
     }
-    return Promise.resolve(docente); // <-- Mock temporal
+    // Registrar la asignación:
+    asignacionesDocentes.push({ docenteId, asignaturaId });
+  });
+  return Promise.resolve();
   },
 };

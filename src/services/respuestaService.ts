@@ -29,6 +29,12 @@ const mockRespuestas = [
       { id_pregunta: 2, respuesta: 'París' }
     ],
     fecha: '2024-06-09',
+    // Campos para filtros y visualización:
+    nombre_estudiante: 'Juan Pérez',
+    rut_estudiante: '11.111.111-1',
+    carrera: 'ING-SOFT',
+    asignatura: 'Matemáticas I',
+    año_ingreso: 2022
   },
   {
     id: 'resp2',
@@ -52,6 +58,11 @@ const mockRespuestas = [
       { id_pregunta: 2, respuesta: '1818' }
     ],
     fecha: '2024-06-09',
+    nombre_estudiante: 'María Gómez',
+    rut_estudiante: '22.222.222-2',
+    carrera: 'ING-CIVIL',
+    asignatura: 'Historia Universal',
+    año_ingreso: 2023
   },
 ];
 

@@ -1,64 +1,120 @@
 .form-designar-asignatura {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  max-width: 900px;
+  margin: 32px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(44,53,80,0.08);
   padding: 32px 28px;
-  max-width: 420px;
-  margin: 0 auto;
-  box-shadow: 0 2px 8px rgba(44, 53, 80, 0.07);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
 }
 
 .form-designar-asignatura h2 {
-  margin: 0 0 10px 0;
-  font-size: 1.5rem;
-  color: #2c3550;
+  font-size: 2rem;
   font-weight: bold;
+  color: #2c3550;
+  margin-bottom: 12px;
   text-align: center;
 }
 
-.form-designar-asignatura select,
-.form-designar-asignatura button {
-  padding: 10px 12px;
-  font-size: 1rem;
-  border-radius: 5px;
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.filtros input,
+.filtros select {
+  padding: 8px 12px;
   border: 1px solid #ddd;
-  margin-bottom: 8px;
-  background: #fff;
-  transition: border 0.2s;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f9f9f9;
+  min-width: 180px;
 }
 
-.form-designar-asignatura select:focus {
-  border-color: #3498db;
-  outline: none;
+.tabla-estudiantes {
+  overflow-x: auto;
+  border-radius: 10px;
+  background: #f8fbff;
+  box-shadow: 0 1px 6px rgba(44,53,80,0.06);
 }
 
-.form-designar-asignatura button {
+.tabla-estudiantes table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.tabla-estudiantes th, .tabla-estudiantes td {
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.tabla-estudiantes th {
+  background: #3498db;
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid #217dbb;
+}
+
+.tabla-estudiantes tr:nth-child(even) {
+  background: #f4faff;
+}
+
+.tabla-estudiantes tr:hover {
+  background: #eaf6fd;
+}
+
+.tabla-estudiantes input[type="checkbox"] {
+  accent-color: #3498db;
+  width: 18px;
+  height: 18px;
+}
+
+select[required] {
+  border: 2px solid #3498db;
+}
+
+button[type="submit"] {
+  margin-top: 18px;
   background-color: #3498db;
   color: white;
   border: none;
-  font-weight: bold;
+  padding: 12px 28px;
+  border-radius: 6px;
   cursor: pointer;
-  margin-top: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  align-self: flex-end;
   transition: background 0.2s;
 }
 
-.form-designar-asignatura button:hover {
+button[type="submit"]:hover {
   background-color: #217dbb;
 }
 
 .form-designar-asignatura p {
-  margin: 0;
+  margin-top: 10px;
   color: #27ae60;
   font-weight: 500;
   text-align: center;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .form-designar-asignatura {
-    padding: 18px 8px;
-    max-width: 100%;
+    padding: 16px 4vw;
+  }
+  .filtros {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tabla-estudiantes table {
+    min-width: 400px;
+    font-size: 0.95rem;
   }
 }

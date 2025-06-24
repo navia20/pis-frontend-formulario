@@ -1,64 +1,135 @@
 .form-designar-asignatura-docente {
   background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  border: 1.5px solid #3498db;
+  border-radius: 12px;
   padding: 32px 28px;
-  max-width: 420px;
-  margin: 0 auto;
-  box-shadow: 0 2px 8px rgba(44, 53, 80, 0.07);
+  max-width: 600px;
+  margin: 32px auto;
+  box-shadow: 0 2px 16px rgba(44,53,80,0.10);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
 }
 
 .form-designar-asignatura-docente h2 {
-  margin: 0 0 10px 0;
-  font-size: 1.5rem;
+  margin: 0 0 14px 0;
+  font-size: 1.7rem;
   color: #2c3550;
   font-weight: bold;
   text-align: center;
 }
 
-.form-designar-asignatura-docente select,
-.form-designar-asignatura-docente button {
-  padding: 10px 12px;
-  font-size: 1rem;
-  border-radius: 5px;
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.filtros input {
+  padding: 8px 12px;
   border: 1px solid #ddd;
-  margin-bottom: 8px;
+  border-radius: 6px;
+  font-size: 1rem;
   background: #fff;
+  min-width: 160px;
+}
+
+.tabla-docentes {
+  overflow-x: auto;
+  border-radius: 10px;
+  background: #f8fbff;
+  box-shadow: 0 1px 6px rgba(44,53,80,0.06);
+}
+
+.tabla-docentes table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+.tabla-docentes th, .tabla-docentes td {
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.tabla-docentes th {
+  background: #3498db;
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid #217dbb;
+}
+
+.tabla-docentes tr:nth-child(even) {
+  background: #f4faff;
+}
+
+.tabla-docentes tr:hover {
+  background: #eaf6fd;
+}
+
+.tabla-docentes input[type="checkbox"] {
+  accent-color: #3498db;
+  width: 18px;
+  height: 18px;
+}
+
+.form-designar-asignatura-docente select {
+  padding: 10px 14px;
+  border: 1.5px solid #3498db;
+  border-radius: 7px;
+  font-size: 1.08rem;
+  background: #fff;
+  margin-bottom: 8px;
+  outline: none;
   transition: border 0.2s;
 }
 
 .form-designar-asignatura-docente select:focus {
-  border-color: #3498db;
-  outline: none;
+  border-color: #217dbb;
 }
 
-.form-designar-asignatura-docente button {
+.form-designar-asignatura-docente button[type="submit"] {
+  margin-top: 10px;
   background-color: #3498db;
   color: white;
   border: none;
-  font-weight: bold;
+  padding: 12px 28px;
+  border-radius: 6px;
   cursor: pointer;
-  margin-top: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  align-self: flex-end;
   transition: background 0.2s;
 }
 
-.form-designar-asignatura-docente button:hover {
+.form-designar-asignatura-docente button[type="submit"]:hover {
   background-color: #217dbb;
 }
 
 .form-designar-asignatura-docente p {
-  margin: 0;
+  margin-top: 10px;
   color: #27ae60;
   font-weight: 500;
   text-align: center;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .form-designar-asignatura-docente {
-    padding: 18px 8px;
-    max-width: 100%;
+    padding: 16px 4vw;
+    max-width: 98vw;
+  }
+  .filtros {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tabla-docentes table {
+    min-width: 350px;
+    font-size: 0.95rem;
+  }
+  .form-designar-asignatura-docente h2 {
+    font-size: 1.2rem;
   }
 }

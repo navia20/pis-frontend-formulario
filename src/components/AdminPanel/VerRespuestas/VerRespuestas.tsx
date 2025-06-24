@@ -16,12 +16,31 @@ interface RespuestaFormulario {
     id_pregunta: number;
     respuesta: string;
   }[];
+  nombre_estudiante?: string;
+  rut_estudiante?: string;
+  carrera?: string;
+  asignatura?: string;
+  año_ingreso?: number;
 }
 
 export const VerRespuestas: React.FC = () => {
   const [respuestas, setRespuestas] = useState<RespuestaFormulario[]>([]);
   const [loading, setLoading] = useState(true);
   const [seleccionada, setSeleccionada] = useState<number | null>(null);
+
+  // Filtros
+  const [filtros, setFiltros] = useState({
+    nombre: '',
+    rut: '',
+    carrera: '',
+    asignatura: '',
+    año: '',
+  });
+
+  // Opciones para selects
+  const [asignaturas, setAsignaturas] = useState<{ id: string; nombre: string }[]>([]);
+  const [carreras, setCarreras] = useState<{ id: string; nombre: string }[]>([]);
+  const [años, setAños] = useState<number[]>([]);
 
   useEffect(() => {
     respuestaService.getRespuestas()
@@ -36,22 +55,59 @@ export const VerRespuestas: React.FC = () => {
             id_pregunta: resp.id_pregunta ?? resp.pregunta ?? 0,
             respuesta: resp.respuesta,
           })),
+          nombre_estudiante: r.nombre_estudiante || '',
+          rut_estudiante: r.rut_estudiante || '',
+          carrera: r.carrera || '',
+          asignatura: r.asignatura || '',
+          año_ingreso: typeof r.año_ingreso === 'number' ? r.año_ingreso : undefined,
         }));
         setRespuestas(adaptadas);
+
+        // Opciones únicas para selects (corrigiendo tipos)
+        setCarreras(
+          Array.from(new Set(adaptadas.map(r => r.carrera).filter((id): id is string => typeof id === 'string' && id !== '')))
+            .map(id => ({ id, nombre: id }))
+        );
+        setAsignaturas(
+          Array.from(new Set(adaptadas.map(r => r.asignatura).filter((id): id is string => typeof id === 'string' && id !== '')))
+            .map(id => ({ id, nombre: id }))
+        );
+        setAños(
+          Array.from(new Set(adaptadas.map(r => r.año_ingreso).filter((a): a is number => typeof a === 'number')))
+        );
       })
       .finally(() => setLoading(false));
   }, []);
 
+  const handleFiltro = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFiltros({ ...filtros, [e.target.name]: e.target.value });
+  };
+
+  // Filtrado dinámico
+  const respuestasFiltradas = respuestas.filter(r =>
+    (filtros.nombre === '' || (r.nombre_estudiante || '').toLowerCase().includes(filtros.nombre.toLowerCase())) &&
+    (filtros.rut === '' || (r.rut_estudiante || '').includes(filtros.rut)) &&
+    (filtros.carrera === '' || r.carrera === filtros.carrera) &&
+    (filtros.asignatura === '' || r.asignatura === filtros.asignatura) &&
+    (filtros.año === '' || String(r.año_ingreso) === filtros.año)
+  );
+
   if (loading) return <div>Cargando respuestas...</div>;
 
-  // Si hay un formulario seleccionado, muestra el detalle visual centrado y compacto
+  // Vista detalle
   if (seleccionada !== null) {
-    const r = respuestas[seleccionada];
+    const r = respuestasFiltradas[seleccionada];
+    if (!r) return <div>No encontrada</div>;
     return (
       <div className="ver-respuestas-root">
         <button className="btn-retroceder" onClick={() => setSeleccionada(null)}>Volver</button>
         <h2>Respuestas de: {r.titulo}</h2>
         <div style={{ marginBottom: 18 }}>
+          <strong>Estudiante:</strong> {r.nombre_estudiante}<br />
+          <strong>RUT:</strong> {r.rut_estudiante}<br />
+          <strong>Carrera:</strong> {r.carrera}<br />
+          <strong>Asignatura:</strong> {r.asignatura}<br />
+          <strong>Año ingreso:</strong> {r.año_ingreso}<br />
           <strong>ID Formulario:</strong> {r.id_formulario}<br />
           <strong>ID Usuario:</strong> {r.id_usuario}<br />
           <strong>Fecha:</strong> {r.fecha}<br />
@@ -99,15 +155,47 @@ export const VerRespuestas: React.FC = () => {
     );
   }
 
-  // Lista de formularios respondidos para seleccionar
+  // Vista lista con filtros
   return (
     <div>
       <h2>Respuestas de Formularios</h2>
-      {respuestas.length === 0 ? (
+      <div className="filtros" style={{ marginBottom: 18 }}>
+        <input
+          name="nombre"
+          placeholder="Buscar por nombre"
+          value={filtros.nombre}
+          onChange={handleFiltro}
+        />
+        <input
+          name="rut"
+          placeholder="Buscar por RUT"
+          value={filtros.rut}
+          onChange={handleFiltro}
+        />
+        <select name="carrera" value={filtros.carrera} onChange={handleFiltro}>
+          <option value="">Todas las carreras</option>
+          {carreras.map(c => (
+            <option key={c.id} value={c.id}>{c.nombre}</option>
+          ))}
+        </select>
+        <select name="asignatura" value={filtros.asignatura} onChange={handleFiltro}>
+          <option value="">Todas las asignaturas</option>
+          {asignaturas.map(a => (
+            <option key={a.id} value={a.id}>{a.nombre}</option>
+          ))}
+        </select>
+        <select name="año" value={filtros.año} onChange={handleFiltro}>
+          <option value="">Todos los años</option>
+          {años.map(a => (
+            <option key={a} value={String(a)}>{a}</option>
+          ))}
+        </select>
+      </div>
+      {respuestasFiltradas.length === 0 ? (
         <p>No hay respuestas registradas.</p>
       ) : (
         <div className="tabla-respuestas">
-          {respuestas.map((r, i) => (
+          {respuestasFiltradas.map((r, i) => (
             <div
               key={i}
               className="respuesta-card"
@@ -116,13 +204,19 @@ export const VerRespuestas: React.FC = () => {
             >
               <div className="respuesta-card-titulo">{r.titulo}</div>
               <div style={{ fontSize: '0.97rem', color: '#2c3550', marginBottom: 4 }}>
-                <strong>ID Formulario:</strong> {r.id_formulario}
+                <strong>Estudiante:</strong> {r.nombre_estudiante}
               </div>
               <div style={{ fontSize: '0.97rem', color: '#2c3550', marginBottom: 4 }}>
-                <strong>ID Usuario:</strong> {r.id_usuario}
+                <strong>RUT:</strong> {r.rut_estudiante}
               </div>
               <div style={{ fontSize: '0.97rem', color: '#2c3550', marginBottom: 4 }}>
-                <strong>Fecha:</strong> {r.fecha}
+                <strong>Carrera:</strong> {r.carrera}
+              </div>
+              <div style={{ fontSize: '0.97rem', color: '#2c3550', marginBottom: 4 }}>
+                <strong>Asignatura:</strong> {r.asignatura}
+              </div>
+              <div style={{ fontSize: '0.97rem', color: '#2c3550', marginBottom: 4 }}>
+                <strong>Año ingreso:</strong> {r.año_ingreso}
               </div>
               <div style={{ color: '#2980b9', marginTop: 8, fontWeight: 500 }}>Ver respuestas</div>
             </div>
@@ -131,4 +225,4 @@ export const VerRespuestas: React.FC = () => {
       )}
     </div>
   );
-};
+}
