@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { designacionService } from '../../../services/designacionService';
+import { asignaturaService } from '../../../services/asignaturaService';
+import { usuarioService } from '../../../services/usuarioService';
 import './DesignarAsignaturaDocente.css';
 
 interface Docente {
   id: string;
+  tipo: string;
   nombres: string;
   apellidos: string;
   rut: string;
@@ -27,8 +29,14 @@ export const DesignarAsignaturaDocente: React.FC = () => {
   const [mensaje, setMensaje] = useState('');
 
   useEffect(() => {
-    designacionService.getDocentes().then(setDocentes);
-    designacionService.getAsignaturas().then(setAsignaturas);
+    // Obtener docentes del servicio de usuarios
+    usuarioService.getUsuarios().then(usuarios => {
+      const docentesData = usuarios.filter(u => u.tipo === 'docente');
+      setDocentes(docentesData);
+    });
+    
+    // Obtener asignaturas del servicio de asignaturas
+    asignaturaService.getAsignaturas().then(setAsignaturas);
   }, []);
 
   // Filtrado dinámico
@@ -63,9 +71,13 @@ export const DesignarAsignaturaDocente: React.FC = () => {
       return;
     }
     try {
-      await designacionService.asignarAsignaturaDocentes(seleccionados, asignaturaId);
+      await asignaturaService.designarDocentes(asignaturaId, seleccionados);
       setMensaje('Asignatura designada correctamente');
       setSeleccionados([]);
+      
+      // Actualizar la lista de asignaturas para reflejar los cambios
+      const asignaturasActualizadas = await asignaturaService.getAsignaturas();
+      setAsignaturas(asignaturasActualizadas);
     } catch {
       setMensaje('Error al designar asignatura');
     }

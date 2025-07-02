@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LoginForm } from './components/LoginForm/LoginForm';
+import { LoginAdminForm } from './components/LoginForm/LoginAdminForm';
 import { AdminPanel } from './pages/AdminPanel';
 import { EstudiantePanel } from './components/EstudiantetPanel/EstudiantePanel';
 import { DocentePanel } from './components/DocentePanel/DocentePanel';
@@ -10,6 +11,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginForm />} />
+        <Route path="/login-admin" element={<LoginAdminForm />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/estudiante" element={<EstudiantePanel />} />
         <Route path="/docente" element={<DocentePanel />} />

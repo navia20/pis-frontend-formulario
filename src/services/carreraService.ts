@@ -1,13 +1,16 @@
-// Mock de carreras
-const mockCarreras = [
-  { id: 'ING-SOFT', nombre: 'Ingeniería en Software' },
-  { id: 'ING-CIVIL', nombre: 'Ingeniería Civil' },
-  { id: 'DERECHO', nombre: 'Derecho' },
-  // Agrega más carreras si lo necesitas
-];
+// Servicio para gestionar carreras conectado al backend
+import axios from 'axios';
+
+const API_URL = 'http://localhost:3000';
 
 export const carreraService = {
   getCarreras: async () => {
-    return Promise.resolve(mockCarreras);
+    try {
+      const response = await axios.get(`${API_URL}/carreras`);
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo carreras:', error);
+      throw error; // Propagar el error en lugar de usar fallback
+    }
   },
 };
