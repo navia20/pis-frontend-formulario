@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Logo } from '../Logo';
 import './LoginForm.css';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { authService } from '../../services/authService';
 
 export const LoginAdminForm: React.FC = () => {
   const [rut, setRut] = useState('');
@@ -22,22 +22,31 @@ export const LoginAdminForm: React.FC = () => {
     }
     
     try {
-      const response = await axios.post('http://localhost:3000/auth/login', {
-        rut,
-        password,
-        tipo: 'admin',
-      });
+      // Usar el servicio de autenticación en lugar de axios directo
+      const response = await authService.login(rut, password, 'admin');
       
-      if (response.data && response.data.accessToken) {
-        // Guardar el token si es necesario
-        localStorage.setItem('adminToken', response.data.accessToken);
+      if (response && response.accessToken) {
+        console.log('Login de admin exitoso. Redirigiendo al panel de administración');
+        
+        // También obtener el perfil del admin para validar
+        try {
+          const profile = await authService.getProfile();
+          console.log('Perfil de admin cargado:', profile);
+        } catch (profileError) {
+          console.error('Error al cargar perfil del admin:', profileError);
+        }
+        
         navigate('/admin');
       } else {
         setError('Credenciales incorrectas. Por favor, inténtelo de nuevo.');
       }
-    } catch (error) {
-      setError('Error al conectar con el servidor. Intente más tarde.');
-      console.error(error);
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        setError('Credenciales incorrectas. Por favor, inténtelo de nuevo.');
+      } else {
+        setError('Error al conectar con el servidor. Intente más tarde.');
+      }
+      console.error('Error en login de admin:', error);
     }
   };
 
@@ -98,7 +107,7 @@ export const LoginAdminForm: React.FC = () => {
           {error && <div className="login-error-message">{error}</div>}
 
           <div className="login-forgot-password">
-            <a href="/forgot-password">¿Olvidaste tu Contraseña?</a>
+            <a href="/solicitar-recuperacion">¿Olvidaste tu Contraseña?</a>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '15px', marginTop: '10px' }}>

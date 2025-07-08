@@ -104,4 +104,21 @@ export const usuarioService = {
     }
     return Promise.resolve({ deleted: false });
   },
+
+  // Obtener estadísticas de usuarios (total, alumnos, docentes)
+  getEstadisticas: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/admin/estadisticas`);
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo estadísticas:', error);
+      // Fallback a datos mock en caso de error
+      return {
+        total_usuarios: 120,
+        total_alumnos: 105,
+        total_docentes: 15,
+        total_admins: 3
+      };
+    }
+  },
 };

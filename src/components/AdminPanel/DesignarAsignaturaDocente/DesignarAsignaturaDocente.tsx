@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { asignaturaService } from '../../../services/asignaturaService';
-import { usuarioService } from '../../../services/usuarioService';
+import { docenteService } from '../../../services/docenteService';
+import type { Docente } from '../../../services/docenteService';
 import './DesignarAsignaturaDocente.css';
-
-interface Docente {
-  id: string;
-  tipo: string;
-  nombres: string;
-  apellidos: string;
-  rut: string;
-  email: string;
-  activo: boolean;
-}
 
 interface Asignatura {
   id: string;
@@ -27,16 +18,34 @@ export const DesignarAsignaturaDocente: React.FC = () => {
   const [seleccionados, setSeleccionados] = useState<string[]>([]);
   const [asignaturaId, setAsignaturaId] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Obtener docentes del servicio de usuarios
-    usuarioService.getUsuarios().then(usuarios => {
-      const docentesData = usuarios.filter(u => u.tipo === 'docente');
-      setDocentes(docentesData);
-    });
-    
-    // Obtener asignaturas del servicio de asignaturas
-    asignaturaService.getAsignaturas().then(setAsignaturas);
+    const cargarDatos = async () => {
+      try {
+        setLoading(true);
+        
+        // Obtener docentes y asignaturas en paralelo
+        const [docentesData, asignaturasData] = await Promise.all([
+          docenteService.getDocentes(),
+          asignaturaService.getAsignaturas()
+        ]);
+        
+        setDocentes(docentesData);
+        setAsignaturas(asignaturasData);
+        
+        console.log('Docentes cargados:', docentesData);
+        console.log('Asignaturas cargadas:', asignaturasData);
+        
+      } catch (error) {
+        console.error('Error cargando datos:', error);
+        setMensaje('Error cargando datos. Verifica que el backend esté funcionando.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarDatos();
   }, []);
 
   // Filtrado dinámico
@@ -62,7 +71,20 @@ export const DesignarAsignaturaDocente: React.FC = () => {
 
   const handleFiltro = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
+    // Limpiar mensaje cuando el usuario empieza a filtrar
+    if (mensaje) setMensaje('');
   };
+
+  if (loading) {
+    return (
+      <div className="form-designar-asignatura-docente">
+        <h2>Designar Asignatura a Docentes</h2>
+        <div className="loading-message">
+          <p>Cargando datos...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,16 +92,31 @@ export const DesignarAsignaturaDocente: React.FC = () => {
       setMensaje('Selecciona al menos un docente y una asignatura');
       return;
     }
+    
     try {
+      setLoading(true);
+      setMensaje('Designando asignatura...');
+      
+      // Designar la asignatura a los docentes seleccionados
       await asignaturaService.designarDocentes(asignaturaId, seleccionados);
-      setMensaje('Asignatura designada correctamente');
+      
+      const asignaturaSeleccionada = asignaturas.find(a => a.id === asignaturaId);
+      const docentesSeleccionados = docentes.filter(d => seleccionados.includes(d.id));
+      const nombresDocentes = docentesSeleccionados.map(d => `${d.nombres} ${d.apellidos}`).join(', ');
+      
+      setMensaje(`Asignatura "${asignaturaSeleccionada?.nombre}" designada correctamente a: ${nombresDocentes}`);
       setSeleccionados([]);
+      setAsignaturaId('');
       
       // Actualizar la lista de asignaturas para reflejar los cambios
       const asignaturasActualizadas = await asignaturaService.getAsignaturas();
       setAsignaturas(asignaturasActualizadas);
-    } catch {
-      setMensaje('Error al designar asignatura');
+      
+    } catch (error: any) {
+      console.error('Error al designar asignatura:', error);
+      setMensaje(`Error al designar asignatura: ${error.message || 'Error desconocido'}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -140,8 +177,29 @@ export const DesignarAsignaturaDocente: React.FC = () => {
           <option key={a.id} value={a.id}>{a.nombre}</option>
         ))}
       </select>
-      <button type="submit">Designar</button>
-      {mensaje && <p>{mensaje}</p>}
+      
+      <div className="info-seleccion">
+        <p>Docentes seleccionados: {seleccionados.length}</p>
+        {seleccionados.length > 0 && (
+          <p className="docentes-seleccionados">
+            {docentes
+              .filter(d => seleccionados.includes(d.id))
+              .map(d => `${d.nombres} ${d.apellidos}`)
+              .join(', ')
+            }
+          </p>
+        )}
+      </div>
+      
+      <button type="submit" disabled={loading || !asignaturaId || seleccionados.length === 0}>
+        {loading ? 'Designando...' : 'Designar'}
+      </button>
+      
+      {mensaje && (
+        <div className={`mensaje ${mensaje.includes('Error') ? 'error' : 'success'}`}>
+          {mensaje}
+        </div>
+      )}
     </form>
   );
 };

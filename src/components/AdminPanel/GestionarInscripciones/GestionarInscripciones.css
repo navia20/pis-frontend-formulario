@@ -1,0 +1,237 @@
+.gestionar-inscripciones {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gestionar-inscripciones h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.mensaje {
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.mensaje.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.mensaje.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.filtros {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filtros input,
+.filtros select {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fff;
+  min-width: 200px;
+  flex: 1;
+}
+
+.filtros input:focus,
+.filtros select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.estadisticas {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #28a745;
+  margin-bottom: 20px;
+}
+
+.estadisticas span {
+  font-weight: 500;
+  color: #495057;
+}
+
+.tabla-inscripciones {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.tabla-inscripciones table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.tabla-inscripciones th,
+.tabla-inscripciones td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.tabla-inscripciones th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tabla-inscripciones tr:hover {
+  background: #f8f9fa;
+}
+
+.estado {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.estado-inscrito {
+  background: #d4edda;
+  color: #155724;
+}
+
+.estado-retirado {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.estado-completado {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.select-estado {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background: white;
+  cursor: pointer;
+}
+
+.select-estado:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.btn-eliminar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  transition: background-color 0.2s;
+}
+
+.btn-eliminar:hover {
+  background: #f8d7da;
+}
+
+.no-resultados {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  font-style: italic;
+  background: #f8f9fa;
+  margin: 20px;
+  border-radius: 8px;
+}
+
+.acciones-generales {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.btn-actualizar {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-actualizar:hover {
+  background: #218838;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .gestionar-inscripciones {
+    padding: 15px;
+  }
+  
+  .filtros {
+    flex-direction: column;
+  }
+  
+  .filtros input,
+  .filtros select {
+    min-width: auto;
+  }
+  
+  .estadisticas {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tabla-inscripciones table {
+    font-size: 0.9rem;
+  }
+  
+  .tabla-inscripciones th,
+  .tabla-inscripciones td {
+    padding: 8px 10px;
+  }
+  
+  .acciones {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

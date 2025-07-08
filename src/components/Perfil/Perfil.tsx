@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Perfil.css';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import BookIcon from '@mui/icons-material/Book';
 import SchoolIcon from '@mui/icons-material/School';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import type { Usuario, Admin, Alumno } from '../../types/usuario';
+import { CambiarPasswordPerfil } from './CambiarPasswordPerfil';
 
 interface PerfilProps {
   usuario: Usuario;
@@ -13,6 +14,8 @@ interface PerfilProps {
 }
 
 export const Perfil: React.FC<PerfilProps> = ({ usuario }) => {
+  const [mostrarCambiarPassword, setMostrarCambiarPassword] = useState(false);
+
   const renderIconoTipo = () => {
     switch (usuario.tipo) {
       case 'admin':
@@ -119,13 +122,45 @@ export const Perfil: React.FC<PerfilProps> = ({ usuario }) => {
         </div>
         <div className="profile-field">
           <label>Contraseña:</label>
-          <input
-            type="password"
-            value="********"
-            disabled
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <input
+              type="password"
+              value="********"
+              disabled
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              onClick={() => setMostrarCambiarPassword(!mostrarCambiarPassword)}
+              style={{
+                backgroundColor: '#1976d2',
+                color: 'white',
+                border: 'none',
+                padding: '8px 15px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.9rem'
+              }}
+            >
+              {mostrarCambiarPassword ? 'Cancelar' : 'Cambiar'}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Componente para cambiar contraseña */}
+      {mostrarCambiarPassword && (
+        <CambiarPasswordPerfil
+          usuarioId={usuario.id}
+          tipoUsuario={usuario.tipo}
+          onSuccess={() => {
+            setMostrarCambiarPassword(false);
+          }}
+          onCancel={() => {
+            setMostrarCambiarPassword(false);
+          }}
+        />
+      )}
     </div>
   );
 };

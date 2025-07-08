@@ -23,3 +23,43 @@
 .admin-btn-retroceder:hover {
   background-color: #217dbb;
 }
+
+.admin-formulario-estado {
+  position: relative;
+}
+
+.admin-formulario-enviado {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #28a745;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.admin-formulario-publicado {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #007bff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.admin-formulario-borrador {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #6c757d;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}

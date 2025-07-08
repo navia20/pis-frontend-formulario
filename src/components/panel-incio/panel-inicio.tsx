@@ -40,23 +40,8 @@ export const PanelInicio: React.FC<PanelInicioProps> = ({ usuario }) => {
   const [horaActual, setHoraActual] = useState<string>("");
 
   useEffect(() => {
-  if (!usuario) {
-    // Usuario de ejemplo solo si no se recibe ninguno por props
-    const ejemploUsuario: Alumno = {
-      id: "1",
-      nombres: "Juan Carlos",
-      apellidos: "Pérez González",
-      tipo: "alumno",
-      nombre_carrera: "Ingeniería Civil Informática",
-      semestre: "6° Semestre",
-      asignaturas: ["Matemáticas", "Programación", "Bases de Datos"],
-      año_ingreso: "2022",
-    };
-    setUsuarioActual(ejemploUsuario);
-  } else {
+    // Usar siempre el usuario proporcionado por props, sin fallback a datos mock
     setUsuarioActual(usuario);
-  }
-
 
     // Actualizar hora actual
     const actualizarHora = () => {

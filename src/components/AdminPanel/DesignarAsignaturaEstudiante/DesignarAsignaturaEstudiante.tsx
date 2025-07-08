@@ -1,41 +1,74 @@
 import React, { useEffect, useState } from 'react';
-import { asignaturaService } from '../../../services/asignaturaService';
-import { designacionService } from '../../../services/designacionService';
+import { inscripcionService, Alumno } from '../../../services/inscripcionService';
+import { asignaturaService, Asignatura } from '../../../services/asignaturaService';
+import { carreraService, Carrera } from '../../../services/carreraService';
 import './DesignarAsignaturaEstudiante.css';
 
-interface Alumno {
-  id: string;
-  nombres: string;
-  apellidos: string;
-  rut: string;
-  email: string;
-  id_carrera: string;
-  año_ingreso: number;
-  activo: boolean;
-}
-
 export const DesignarAsignaturaEstudiante: React.FC = () => {
-  const [estudiantes, setEstudiantes] = useState<Alumno[]>([]);
-  const [asignaturas, setAsignaturas] = useState<any[]>([]);
-  const [filtros, setFiltros] = useState({ nombre: '', rut: '', año: '', carrera: '' });
+  const [alumnos, setAlumnos] = useState<Alumno[]>([]);
+  const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
+  const [carreras, setCarreras] = useState<Carrera[]>([]);
+  const [filtros, setFiltros] = useState({ 
+    nombre: '', 
+    rut: '', 
+    carrera: '',
+    año_ingreso: '' 
+  });
   const [seleccionados, setSeleccionados] = useState<string[]>([]);
   const [asignaturaId, setAsignaturaId] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [designando, setDesignando] = useState(false);
 
   useEffect(() => {
-  designacionService.getEstudiantes().then(data => {
-    setEstudiantes(data);
-  });
-  asignaturaService.getAsignaturas().then(setAsignaturas);
-}, []);
+    cargarDatos();
+  }, []);
+
+  const cargarDatos = async () => {
+    try {
+      setLoading(true);
+      const [alumnosData, asignaturasData, carrerasData] = await Promise.all([
+        inscripcionService.getAlumnos(),
+        asignaturaService.getAsignaturas(),
+        carreraService.getCarreras()
+      ]);
+      
+      setAlumnos(alumnosData);
+      setAsignaturas(asignaturasData);
+      setCarreras(carrerasData);
+      
+      console.log('Datos cargados:');
+      console.log('Alumnos:', alumnosData);
+      console.log('Carreras:', carrerasData);
+    } catch (error) {
+      console.error('Error cargando datos:', error);
+      setMensaje('Error cargando datos del servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Función para obtener el nombre de la carrera
+  const obtenerNombreCarrera = (id_carrera: string) => {
+    console.log('Buscando carrera para ID:', id_carrera);
+    console.log('Carreras disponibles:', carreras);
+    const carrera = carreras.find(c => c.id === id_carrera);
+    console.log('Carrera encontrada:', carrera);
+    return carrera ? carrera.nombre : `ID: ${id_carrera}`;
+  };
 
   // Filtrado dinámico
-  const estudiantesFiltrados = estudiantes.filter(e =>
-    (filtros.nombre === '' || `${e.nombres} ${e.apellidos}`.toLowerCase().includes(filtros.nombre.toLowerCase())) &&
-    (filtros.rut === '' || e.rut.includes(filtros.rut)) &&
-    (filtros.año === '' || String(e.año_ingreso) === filtros.año) &&
-    (filtros.carrera === '' || e.id_carrera === filtros.carrera)
-  );
+  const alumnosFiltrados = alumnos.filter(alumno => {
+    const nombreCompleto = `${alumno.nombres} ${alumno.apellidos}`.toLowerCase();
+    const nombreCarrera = obtenerNombreCarrera(alumno.id_carrera).toLowerCase();
+    
+    const cumpleFiltroNombre = !filtros.nombre || nombreCompleto.includes(filtros.nombre.toLowerCase());
+    const cumpleFiltroRut = !filtros.rut || alumno.rut.includes(filtros.rut);
+    const cumpleFiltroCarrera = !filtros.carrera || nombreCarrera.includes(filtros.carrera.toLowerCase());
+    const cumpleFiltroAño = !filtros.año_ingreso || alumno.año_ingreso.toString().includes(filtros.año_ingreso);
+    
+    return cumpleFiltroNombre && cumpleFiltroRut && cumpleFiltroCarrera && cumpleFiltroAño && alumno.activo;
+  });
 
   // Selección múltiple
   const toggleSeleccion = (id: string) => {
@@ -45,14 +78,14 @@ export const DesignarAsignaturaEstudiante: React.FC = () => {
   };
 
   const toggleSeleccionTodos = () => {
-    if (seleccionados.length === estudiantesFiltrados.length) {
+    if (seleccionados.length === alumnosFiltrados.length) {
       setSeleccionados([]);
     } else {
-      setSeleccionados(estudiantesFiltrados.map(e => e.id));
+      setSeleccionados(alumnosFiltrados.map(a => a.id));
     }
   };
 
-  const handleFiltro = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleFiltro = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
   };
 
@@ -62,34 +95,75 @@ export const DesignarAsignaturaEstudiante: React.FC = () => {
       setMensaje('Selecciona al menos un estudiante y una asignatura');
       return;
     }
+
     try {
-      await designacionService.asignarAsignaturaEstudiantes(seleccionados, asignaturaId);
-      setMensaje('Asignatura designada correctamente');
+      setDesignando(true);
+      setMensaje('');
+      
+      await inscripcionService.inscribirMultiples(asignaturaId, seleccionados);
+      
+      setMensaje(`Asignatura designada correctamente a ${seleccionados.length} estudiante(s)`);
       setSeleccionados([]);
-    } catch {
-      setMensaje('Error al designar asignatura');
+      setAsignaturaId('');
+      
+      // Opcional: Recargar datos para ver las inscripciones actualizadas
+      await cargarDatos();
+    } catch (error) {
+      console.error('Error designando asignatura:', error);
+      setMensaje('Error al designar asignatura. Algunos estudiantes podrían ya estar inscritos.');
+    } finally {
+      setDesignando(false);
     }
   };
 
-  // Opcional: obtener lista de carreras y años únicos para los filtros
-  const carreras = Array.from(new Set(estudiantes.map(e => e.id_carrera)));
-  const años = Array.from(new Set(estudiantes.map(e => e.año_ingreso)));
+  if (loading) {
+    return (
+      <div className="form-designar-asignatura-estudiante">
+        <div className="loading">Cargando estudiantes y asignaturas...</div>
+      </div>
+    );
+  }
 
   return (
-    <form className="form-designar-asignatura" onSubmit={handleSubmit}>
+    <form className="form-designar-asignatura-estudiante" onSubmit={handleSubmit}>
       <h2>Designar Asignatura a Estudiantes</h2>
+      
+      {/* Filtros */}
       <div className="filtros">
-        <input name="nombre" placeholder="Buscar por nombre" value={filtros.nombre} onChange={handleFiltro} />
-        <input name="rut" placeholder="Buscar por RUT" value={filtros.rut} onChange={handleFiltro} />
-        <select name="carrera" value={filtros.carrera} onChange={handleFiltro}>
-          <option value="">Todas las carreras</option>
-          {carreras.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <select name="año" value={filtros.año} onChange={handleFiltro}>
-          <option value="">Todos los años</option>
-          {años.map(a => <option key={a} value={a}>{a}</option>)}
-        </select>
+        <input
+          name="nombre"
+          placeholder="Buscar por nombre"
+          value={filtros.nombre}
+          onChange={handleFiltro}
+        />
+        <input
+          name="rut"
+          placeholder="Buscar por RUT"
+          value={filtros.rut}
+          onChange={handleFiltro}
+        />
+        <input
+          name="carrera"
+          placeholder="Buscar por carrera"
+          value={filtros.carrera}
+          onChange={handleFiltro}
+        />
+        <input
+          name="año_ingreso"
+          placeholder="Año de ingreso"
+          value={filtros.año_ingreso}
+          onChange={handleFiltro}
+        />
       </div>
+
+      {/* Estadísticas */}
+      <div className="estadisticas">
+        <span>Total estudiantes: {alumnos.length}</span>
+        <span>Filtrados: {alumnosFiltrados.length}</span>
+        <span>Seleccionados: {seleccionados.length}</span>
+      </div>
+
+      {/* Tabla de estudiantes */}
       <div className="tabla-estudiantes">
         <table>
           <thead>
@@ -97,43 +171,76 @@ export const DesignarAsignaturaEstudiante: React.FC = () => {
               <th>
                 <input
                   type="checkbox"
-                  checked={seleccionados.length === estudiantesFiltrados.length && estudiantesFiltrados.length > 0}
+                  checked={seleccionados.length === alumnosFiltrados.length && alumnosFiltrados.length > 0}
                   onChange={toggleSeleccionTodos}
                 />
               </th>
               <th>Nombre</th>
               <th>RUT</th>
+              <th>Email</th>
               <th>Carrera</th>
-              <th>Año ingreso</th>
+              <th>Año Ingreso</th>
             </tr>
           </thead>
           <tbody>
-            {estudiantesFiltrados.map(e => (
-              <tr key={e.id}>
+            {alumnosFiltrados.map(alumno => (
+              <tr key={alumno.id}>
                 <td>
                   <input
                     type="checkbox"
-                    checked={seleccionados.includes(e.id)}
-                    onChange={() => toggleSeleccion(e.id)}
+                    checked={seleccionados.includes(alumno.id)}
+                    onChange={() => toggleSeleccion(alumno.id)}
                   />
                 </td>
-                <td>{e.nombres} {e.apellidos}</td>
-                <td>{e.rut}</td>
-                <td>{e.id_carrera}</td>
-                <td>{e.año_ingreso}</td>
+                <td>{alumno.nombres} {alumno.apellidos}</td>
+                <td>{alumno.rut}</td>
+                <td>{alumno.email}</td>
+                <td>{obtenerNombreCarrera(alumno.id_carrera)}</td>
+                <td>{alumno.año_ingreso}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        
+        {alumnosFiltrados.length === 0 && (
+          <div className="no-resultados">
+            No se encontraron estudiantes con los filtros aplicados
+          </div>
+        )}
       </div>
-      <select value={asignaturaId} onChange={e => setAsignaturaId(e.target.value)} required>
-        <option value="">Selecciona asignatura</option>
-        {asignaturas.map(a => (
-          <option key={a.id} value={a.id}>{a.nombre}</option>
-        ))}
-      </select>
-      <button type="submit">Designar</button>
-      {mensaje && <p>{mensaje}</p>}
+
+      {/* Selector de asignatura */}
+      <div className="selector-asignatura">
+        <select 
+          value={asignaturaId} 
+          onChange={e => setAsignaturaId(e.target.value)} 
+          required
+          disabled={designando}
+        >
+          <option value="">Selecciona una asignatura</option>
+          {asignaturas.map(asignatura => (
+            <option key={asignatura.id} value={asignatura.id}>
+              {asignatura.nombre}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Botón de submit */}
+      <button 
+        type="submit" 
+        disabled={designando || seleccionados.length === 0 || !asignaturaId}
+        className={designando ? 'designando' : ''}
+      >
+        {designando ? 'Designando...' : `Designar a ${seleccionados.length} estudiante(s)`}
+      </button>
+
+      {/* Mensaje de estado */}
+      {mensaje && (
+        <div className={`mensaje ${mensaje.includes('Error') ? 'error' : 'success'}`}>
+          {mensaje}
+        </div>
+      )}
     </form>
   );
 };

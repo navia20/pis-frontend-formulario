@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { respuestaService } from '../../../services/respuestaService';
+import { adminRespuestasService } from '../../../services/adminRespuestasService';
 import './VerRespuestas.css';
 
 interface RespuestaFormulario {
+  id: string;
   id_formulario: number;
   id_usuario: string;
   fecha: string;
@@ -16,11 +17,11 @@ interface RespuestaFormulario {
     id_pregunta: number;
     respuesta: string;
   }[];
-  nombre_estudiante?: string;
-  rut_estudiante?: string;
-  carrera?: string;
-  asignatura?: string;
-  año_ingreso?: number;
+  nombre_estudiante: string;
+  rut_estudiante: string;
+  carrera: string;
+  asignatura: string;
+  año_ingreso: number;
 }
 
 export const VerRespuestas: React.FC = () => {
@@ -43,40 +44,34 @@ export const VerRespuestas: React.FC = () => {
   const [años, setAños] = useState<number[]>([]);
 
   useEffect(() => {
-    respuestaService.getRespuestas()
-      .then((data: any[]) => {
-        const adaptadas: RespuestaFormulario[] = data.map((r: any) => ({
-          id_formulario: Number(r.id_formulario),
-          id_usuario: r.id_usuario,
-          fecha: r.fecha,
-          titulo: r.titulo || 'Sin título',
-          preguntas: r.preguntas || [],
-          respuestas: (r.respuestas || []).map((resp: any) => ({
-            id_pregunta: resp.id_pregunta ?? resp.pregunta ?? 0,
-            respuesta: resp.respuesta,
-          })),
-          nombre_estudiante: r.nombre_estudiante || '',
-          rut_estudiante: r.rut_estudiante || '',
-          carrera: r.carrera || '',
-          asignatura: r.asignatura || '',
-          año_ingreso: typeof r.año_ingreso === 'number' ? r.año_ingreso : undefined,
-        }));
-        setRespuestas(adaptadas);
+    console.log('🔍 Admin: Cargando respuestas desde la base de datos...');
+    
+    adminRespuestasService.getRespuestas()
+      .then((data) => {
+        console.log('✅ Respuestas obtenidas para admin:', data.length);
+        console.log('📋 Datos completos recibidos:', data);
+        setRespuestas(data);
 
-        // Opciones únicas para selects (corrigiendo tipos)
+        // Opciones únicas para selects
         setCarreras(
-          Array.from(new Set(adaptadas.map(r => r.carrera).filter((id): id is string => typeof id === 'string' && id !== '')))
-            .map(id => ({ id, nombre: id }))
+          Array.from(new Set(data.map(r => r.carrera).filter((carrera): carrera is string => typeof carrera === 'string' && carrera !== '')))
+            .map(nombre => ({ id: nombre, nombre }))
         );
         setAsignaturas(
-          Array.from(new Set(adaptadas.map(r => r.asignatura).filter((id): id is string => typeof id === 'string' && id !== '')))
-            .map(id => ({ id, nombre: id }))
+          Array.from(new Set(data.map(r => r.asignatura).filter((asignatura): asignatura is string => typeof asignatura === 'string' && asignatura !== '')))
+            .map(nombre => ({ id: nombre, nombre }))
         );
         setAños(
-          Array.from(new Set(adaptadas.map(r => r.año_ingreso).filter((a): a is number => typeof a === 'number')))
+          Array.from(new Set(data.map(r => r.año_ingreso).filter((a): a is number => typeof a === 'number')))
         );
       })
-      .finally(() => setLoading(false));
+      .catch((error) => {
+        console.error('❌ Error al obtener respuestas:', error);
+      })
+      .finally(() => {
+        console.log('🏁 Carga de respuestas finalizada');
+        setLoading(false);
+      });
   }, []);
 
   const handleFiltro = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -85,8 +80,8 @@ export const VerRespuestas: React.FC = () => {
 
   // Filtrado dinámico
   const respuestasFiltradas = respuestas.filter(r =>
-    (filtros.nombre === '' || (r.nombre_estudiante || '').toLowerCase().includes(filtros.nombre.toLowerCase())) &&
-    (filtros.rut === '' || (r.rut_estudiante || '').includes(filtros.rut)) &&
+    (filtros.nombre === '' || r.nombre_estudiante.toLowerCase().includes(filtros.nombre.toLowerCase())) &&
+    (filtros.rut === '' || r.rut_estudiante.includes(filtros.rut)) &&
     (filtros.carrera === '' || r.carrera === filtros.carrera) &&
     (filtros.asignatura === '' || r.asignatura === filtros.asignatura) &&
     (filtros.año === '' || String(r.año_ingreso) === filtros.año)
@@ -192,7 +187,17 @@ export const VerRespuestas: React.FC = () => {
         </select>
       </div>
       {respuestasFiltradas.length === 0 ? (
-        <p>No hay respuestas registradas.</p>
+        <div>
+          <p>No hay respuestas registradas.</p>
+          <div style={{ marginTop: 10, padding: 10, backgroundColor: '#f0f0f0', fontSize: '0.9em' }}>
+            <strong>Debug Info:</strong><br/>
+            Total respuestas cargadas: {respuestas.length}<br/>
+            Carreras disponibles: {carreras.length}<br/>
+            Asignaturas disponibles: {asignaturas.length}<br/>
+            Años disponibles: {años.length}<br/>
+            <small>Revisa la consola (F12) para más detalles</small>
+          </div>
+        </div>
       ) : (
         <div className="tabla-respuestas">
           {respuestasFiltradas.map((r, i) => (

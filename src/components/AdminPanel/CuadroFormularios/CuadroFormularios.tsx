@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { CrearFormulario } from '../CrearFormulario/CrearFormulario';
 import { FormularioCard } from './FormularioCard/FormularioCard';
+import { encuestaService } from '../../../services/encuestaService';
 import type { Formulario } from '../../../types/formulario';
 import './CuadroFormularios.css';
 
@@ -9,38 +10,52 @@ interface CuadroFormulariosProps {
   formularios: Formulario[];
   setFormularios: React.Dispatch<React.SetStateAction<Formulario[]>>;
   setFormularioSoloLectura: (formulario: Formulario | null) => void;
+  onRecargarFormularios?: () => void;
+  onGuardarFormulario?: (formulario: Formulario) => Promise<void>;
 }
 
 export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
   formularios,
   setFormularios,
   setFormularioSoloLectura,
+  onRecargarFormularios,
+  onGuardarFormulario,
 }) => {
-  const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
+  const [menuAbierto, setMenuAbierto] = useState<string | null>(null);
   const [formularioEnEdicion, setFormularioEnEdicion] = useState<Formulario | null>(null);
 
-  const handleGuardarFormulario = (formulario: Formulario) => {
-    if (formulario.id && formularios.some(f => f.id === formulario.id)) {
-      setFormularios(prev =>
-        prev.map(f => (f.id === formulario.id ? { ...formulario } : f))
-      );
+  const handleGuardarFormulario = async (formulario: Formulario) => {
+    if (onGuardarFormulario) {
+      // Usar la función de guardado del parent (AdminPanel) que hace la llamada al backend
+      await onGuardarFormulario(formulario);
+      // Recargar formularios para reflejar los cambios
+      if (onRecargarFormularios) {
+        onRecargarFormularios();
+      }
     } else {
-      setFormularios(prev => [
-        ...prev,
-        {
-          ...formulario,
-          id: prev.length ? Math.max(...prev.map(f => f.id)) + 1 : 1,
-          asignatura: formulario.asignatura || null,
-          fechaLimite: formulario.fechaLimite || null,
-          enviado: false,
-          editandoTitulo: formulario.editandoTitulo ?? false,
-        },
-      ]);
+      // Fallback: manejo local (no debería usarse en producción)
+      if (formulario.id && formularios.some(f => f.id === formulario.id)) {
+        setFormularios(prev =>
+          prev.map(f => (f.id === formulario.id ? { ...formulario } : f))
+        );
+      } else {
+        setFormularios(prev => [
+          ...prev,
+          {
+            ...formulario,
+            id: prev.length ? `form_${Date.now()}_${prev.length}` : 'form_1',
+            asignatura: formulario.asignatura || null,
+            fechaLimite: formulario.fechaLimite || null,
+            enviado: false,
+            editandoTitulo: formulario.editandoTitulo ?? false,
+          },
+        ]);
+      }
     }
     setFormularioEnEdicion(null);
   };
 
-  const handleEliminarFormulario = (id: number) => {
+  const handleEliminarFormulario = (id: string) => {
     setFormularios(prev => prev.filter(f => f.id !== id));
     setMenuAbierto(null);
     // TODO: Llamar a backend para eliminar si existe endpoint
@@ -59,13 +74,31 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
     return true;
   };
 
-  const handleEnviarAsignatura = (id: number) => {
+  const handleEnviarAsignatura = async (id: string) => {
     const formulario = formularios.find(f => f.id === id);
     if (!formulario || !puedeEnviarFormulario(formulario)) return;
-    // TODO: Llamar a backend para marcar como enviado
-    setFormularios(prev =>
-      prev.map(f => (f.id === id ? { ...f, enviado: true } : f))
-    );
+    
+    try {
+      if (formulario.publicado) {
+        // Despublicar
+        await encuestaService.despublicarEncuesta(id);
+        setFormularios(prev =>
+          prev.map(f => (f.id === id ? { ...f, enviado: false, publicado: false } : f))
+        );
+      } else {
+        // Publicar
+        await encuestaService.publicarEncuesta(id);
+        setFormularios(prev =>
+          prev.map(f => (f.id === id ? { ...f, enviado: true, publicado: true } : f))
+        );
+      }
+      // Recargar desde el backend para estar seguros
+      if (onRecargarFormularios) {
+        onRecargarFormularios();
+      }
+    } catch (error) {
+      console.error('Error al cambiar estado de publicación:', error);
+    }
     setMenuAbierto(null);
   };
 
@@ -102,8 +135,8 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
             });
             setMenuAbierto(null);
           }}
-          onEliminar={() => handleEliminarFormulario(formulario.id)}
-          onEnviar={() => handleEnviarAsignatura(formulario.id)}
+          onEliminar={() => formulario.id && handleEliminarFormulario(formulario.id)}
+          onEnviar={() => formulario.id && handleEnviarAsignatura(formulario.id)}
           onVer={() => {
             setFormularioSoloLectura(formulario);
             setMenuAbierto(null);
@@ -115,7 +148,7 @@ export const CuadroFormularios: React.FC<CuadroFormulariosProps> = ({
         className="admin-formulario-cuadro admin-formulario-cuadro-nuevo"
         onClick={() =>
           setFormularioEnEdicion({
-            id: 0,
+            id: undefined,
             titulo: '',
             preguntas: [],
             asignatura: null,

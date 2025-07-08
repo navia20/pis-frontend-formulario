@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './CrearFormulario.css';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import type { Pregunta, Formulario } from '../../../types/formulario';
 import { PreguntaEditor } from './PreguntaEditor/PreguntaEditor';
+import { asignaturaService, Asignatura } from '../../../services/asignaturaService';
 
 /**
  * Componente para crear o editar un formulario de preguntas.
@@ -32,23 +33,28 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
     formulario?.editandoTitulo ?? !soloLectura
   );
   const [errorTitulo, setErrorTitulo] = useState('');
-  const [errorPregunta, setErrorPregunta] = useState<{ [id: number]: string }>({});
+  const [errorPregunta, setErrorPregunta] = useState<{ [id: string]: string }>({});
   const [errorFormulario, setErrorFormulario] = useState('');
+  const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
+
+  // Cargar asignaturas del backend
+  useEffect(() => {
+    const cargarAsignaturas = async () => {
+      try {
+        const asignaturasData = await asignaturaService.getAsignaturas();
+        setAsignaturas(asignaturasData);
+      } catch (error) {
+        console.error('Error cargando asignaturas:', error);
+      }
+    };
+    cargarAsignaturas();
+  }, []);
 
   // Validación: si no hay formulario, no renderizar nada
   if (!formulario) return null;
 
   // Desestructuración para claridad
   const { titulo, preguntas, asignatura, fechaLimite } = formulario;
-
-  // Opciones de asignatura (simulado, reemplazar por fetch si es backend real)
-  const asignaturasDisponibles = [
-    'Matemáticas',
-    'Lenguaje',
-    'Historia',
-    'Ciencias',
-    'Inglés',
-  ];
 
   // Actualiza la fecha límite del formulario
   const actualizarFechaLimite = (nuevaFecha: string) => {
@@ -72,7 +78,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   const agregarPregunta = () => {
     if (soloLectura) return;
     const nuevaPregunta: Pregunta = {
-      id: preguntas.length + 1,
+      id: `pregunta_${preguntas.length + 1}_${Date.now()}`,
       texto: '',
       respuestas: ['', '', '', ''],
       editando: true,
@@ -85,7 +91,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   };
 
   // Actualiza el texto de una pregunta
-  const actualizarPregunta = (id: number, texto: string) => {
+  const actualizarPregunta = (id: string, texto: string) => {
     if (soloLectura) return;
     setFormulario({
       ...formulario,
@@ -96,7 +102,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   };
 
   // Actualiza el texto de una respuesta de una pregunta
-  const actualizarRespuesta = (id: number, index: number, texto: string) => {
+  const actualizarRespuesta = (id: string, index: number, texto: string) => {
     if (soloLectura) return;
     setFormulario({
       ...formulario,
@@ -114,7 +120,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   };
 
   // Selecciona la respuesta correcta de una pregunta
-  const seleccionarRespuestaCorrecta = (id: number, index: number) => {
+  const seleccionarRespuestaCorrecta = (id: string, index: number) => {
     if (soloLectura) return;
     setFormulario({
       ...formulario,
@@ -127,7 +133,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   };
 
   // Agrega una alternativa/respuesta a una pregunta
-  const agregarAlternativa = (id: number) => {
+  const agregarAlternativa = (id: string) => {
     if (soloLectura) return;
     setFormulario({
       ...formulario,
@@ -140,7 +146,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   };
 
   // Guarda una pregunta (valida antes)
-  const guardarPregunta = (id: number) => {
+  const guardarPregunta = (id: string) => {
     if (soloLectura) return;
     const pregunta = preguntas.find((p: Pregunta) => p.id === id);
     let error = '';
@@ -167,7 +173,7 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   };
 
   // Permite editar una pregunta ya guardada
-  const editarPregunta = (id: number) => {
+  const editarPregunta = (id: string) => {
     if (soloLectura) return;
     setFormulario({
       ...formulario,
@@ -178,13 +184,13 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
   };
 
   // Elimina una pregunta del formulario
-  const eliminarPregunta = (id: number) => {
+  const eliminarPregunta = (id: string) => {
     if (soloLectura) return;
     setFormulario({
       ...formulario,
       preguntas: preguntas
         .filter((pregunta: Pregunta) => pregunta.id !== id)
-        .map((pregunta: Pregunta, index: number) => ({ ...pregunta, id: index + 1 })),
+        .map((pregunta: Pregunta, index: number) => ({ ...pregunta, id: `pregunta_${index + 1}` })),
     });
   };
 
@@ -264,8 +270,8 @@ export const CrearFormulario: React.FC<CrearFormularioProps> = ({
                 disabled={soloLectura}
               >
                 <option value="">Selecciona</option>
-                {asignaturasDisponibles.map((asig) => (
-                  <option key={asig} value={asig}>{asig}</option>
+                {asignaturas.map((asig) => (
+                  <option key={asig.id} value={asig.id}>{asig.nombre}</option>
                 ))}
               </select>
             )}

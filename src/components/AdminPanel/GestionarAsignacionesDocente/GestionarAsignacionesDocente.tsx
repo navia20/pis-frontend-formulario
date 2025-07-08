@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { asignaturaService, Asignatura } from '../../../services/asignaturaService';
 import { usuarioService } from '../../../services/usuarioService';
+import { carreraService } from '../../../services/carreraService';
 import './GestionarAsignacionesDocente.css';
 
 interface Docente {
@@ -22,6 +23,7 @@ export const GestionarAsignacionesDocente: React.FC = () => {
   const [asignaciones, setAsignaciones] = useState<AsignacionDocente[]>([]);
   const [docentes, setDocentes] = useState<Docente[]>([]);
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
+  const [carreras, setCarreras] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mensaje, setMensaje] = useState('');
 
@@ -33,15 +35,17 @@ export const GestionarAsignacionesDocente: React.FC = () => {
     try {
       setLoading(true);
       
-      // Obtener docentes y asignaturas
-      const [usuarios, asignaturasData] = await Promise.all([
+      // Obtener docentes, asignaturas y carreras
+      const [usuarios, asignaturasData, carrerasData] = await Promise.all([
         usuarioService.getUsuarios(),
-        asignaturaService.getAsignaturas()
+        asignaturaService.getAsignaturas(),
+        carreraService.getCarreras()
       ]);
 
       const docentesData = usuarios.filter(u => u.tipo === 'docente');
       setDocentes(docentesData);
       setAsignaturas(asignaturasData);
+      setCarreras(carrerasData);
 
       // Crear asignaciones: para cada docente, encontrar sus asignaturas
       const asignacionesData: AsignacionDocente[] = docentesData.map(docente => ({
@@ -58,6 +62,12 @@ export const GestionarAsignacionesDocente: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Función para obtener el nombre de la carrera
+  const obtenerNombreCarrera = (id_carrera: string) => {
+    const carrera = carreras.find(c => c.id === id_carrera);
+    return carrera ? carrera.nombre : id_carrera;
   };
 
   const removerAsignacion = async (docenteId: string, asignaturaId: string) => {
@@ -103,7 +113,10 @@ export const GestionarAsignacionesDocente: React.FC = () => {
                 <div className="asignaturas-grid">
                   {asignaturas.map(asignatura => (
                     <div key={asignatura.id} className="asignatura-item">
-                      <span className="asignatura-nombre">{asignatura.nombre}</span>
+                      <div className="asignatura-info">
+                        <span className="asignatura-nombre">{asignatura.nombre}</span>
+                        <span className="asignatura-carrera">{obtenerNombreCarrera(asignatura.id_carrera)}</span>
+                      </div>
                       <button 
                         className="btn-remover"
                         onClick={() => removerAsignacion(docente.id, asignatura.id)}

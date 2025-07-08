@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Logo } from '../Logo';
 import './LoginForm.css';
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
-import axios from 'axios';
+import { authService } from '../../services/authService';
 
 export const LoginForm: React.FC = () => {
   const [rut, setRut] = useState('');
@@ -24,13 +24,20 @@ export const LoginForm: React.FC = () => {
     
     try {
       const tipo = tipoUsuario === 'estudiante' ? 'alumno' : 'docente';
-      const response = await axios.post('http://localhost:3000/auth/login', {
-        rut,
-        password,
-        tipo,
-      });
       
-      if (response.data && response.data.accessToken) {
+      // Usar nuestro servicio de autenticación
+      const response = await authService.login(rut, password, tipo);
+      
+      if (response && response.accessToken) {
+        console.log('Login exitoso. Redirigiendo a:', tipo === 'alumno' ? '/estudiante' : '/docente');
+        
+        // También podemos intentar obtener el perfil de usuario para validar
+        try {
+          await authService.getProfile();
+        } catch (profileError) {
+          console.error('Error al cargar perfil:', profileError);
+        }
+        
         if (tipo === 'alumno') {
           navigate('/estudiante');
         } else {
@@ -39,8 +46,12 @@ export const LoginForm: React.FC = () => {
       } else {
         setError('Credenciales incorrectas. Por favor, inténtelo de nuevo.');
       }
-    } catch (error) {
-      setError('Error al conectar con el servidor. Intente más tarde.');
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        setError('Credenciales incorrectas. Por favor, inténtelo de nuevo.');
+      } else {
+        setError('Error al conectar con el servidor. Intente más tarde.');
+      }
       console.error(error);
     }
   };
@@ -143,14 +154,14 @@ export const LoginForm: React.FC = () => {
           {error && <div className="login-error-message">{error}</div>}
 
           <div className="login-forgot-password">
-            <a href="/forgot-password">¿Olvidaste tu Contraseña?</a>
+            <a href="/solicitar-recuperacion">¿Olvidaste tu Contraseña?</a>
           </div>
 
           <div style={{ textAlign: 'center', marginBottom: '15px' }}>
             <button type="submit" className="login-btn">Ingresar</button>
           </div>
           
-          <div style={{ textAlign: 'center', marginTop: '0px' }}>
+          <div style={{ textAlign: 'center', marginTop: '15px' }}>
             <a 
               href="/login-admin" 
               style={{ 

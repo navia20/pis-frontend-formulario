@@ -107,10 +107,23 @@
   border-left: 3px solid #007bff;
 }
 
-.asignatura-nombre {
+.asignatura-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.asignatura-nombre {
   color: #2c3e50;
   font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.asignatura-carrera {
+  color: #6c757d;
+  font-size: 0.8rem;
+  font-style: italic;
 }
 
 .btn-remover {
