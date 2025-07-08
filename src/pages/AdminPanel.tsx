@@ -6,37 +6,25 @@ import SearchIcon from '@mui/icons-material/Search';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import EditSquareIcon from '@mui/icons-material/EditSquare';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { CrearFormulario } from '../components/AdminPanel/CrearFormulario/CrearFormulario';
 import { CuadroFormularios } from '../components/AdminPanel/CuadroFormularios/CuadroFormularios';
 import { Perfil } from '../components/Perfil/Perfil';
 import type { Usuario } from '../types/usuario';
+import type { Formulario } from '../types/formulario';
 import { useNavigate } from 'react-router-dom';
 import { PanelInicio } from '../components/panel-incio/panel-inicio';
 import { encuestaService } from '../services/encuestaService';
+import { usuarioService } from '../services/usuarioService';
+import { authService } from '../services/authService';
 
 // Importación de los nuevos componentes del panel de administración
 import { CrearUsuario } from '../components/AdminPanel/CrearUsuario/CrearUsuario';
+import { CargaMasivaUsuarios } from '../components/AdminPanel/CargaMasiva/CargaMasivaUsuarios';
 import { VerRespuestas } from '../components/AdminPanel/VerRespuestas/VerRespuestas';
 import { AgregarAsignatura } from '../components/AdminPanel/AgregarAsignatura/AgregarAsignatura';
 import { DesignarAsignaturaEstudiante } from '../components/AdminPanel/DesignarAsignaturaEstudiante/DesignarAsignaturaEstudiante';
 import { DesignarAsignaturaDocente } from '../components/AdminPanel/DesignarAsignaturaDocente/DesignarAsignaturaDocente';
-
-// TODO: Mover estos tipos a src/types/formulario.ts si se usan en más archivos
-interface Pregunta {
-  id: number;
-  texto: string;
-  respuestas: string[];
-  editando: boolean;
-}
-
-interface Formulario {
-  id: number;
-  titulo: string;
-  preguntas: Pregunta[];
-  asignatura?: string | null;
-  enviado?: boolean;
-  editandoTitulo?: boolean;
-}
 
 export const AdminPanel: React.FC = () => {
   const [activeSection, setActiveSection] = useState('Inicio');
@@ -46,32 +34,107 @@ export const AdminPanel: React.FC = () => {
   const [formularios, setFormularios] = useState<Formulario[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estado para las estadísticas
+  const [estadisticas, setEstadisticas] = useState({
+    total_usuarios: 0,
+    total_docentes: 0,
+    total_alumnos: 0,
+    total_admins: 0
+  });
 
   const navigate = useNavigate();
 
-  // Cargar formularios desde el service al montar
+  // Verificar autenticación al cargar el componente
   useEffect(() => {
+    const verificarAutenticacion = async () => {
+      const token = authService.getToken();
+      
+      if (!token) {
+        console.log('No hay token de autenticación. Redirigiendo al login de admin.');
+        navigate('/login-admin');
+        return;
+      }
+
+      try {
+        // Intentar obtener el perfil para validar que el token es válido
+        const profile = await authService.getProfile();
+        
+        if (profile.tipo !== 'admin') {
+          console.log('Usuario no es admin. Redirigiendo al login de admin.');
+          navigate('/login-admin');
+          return;
+        }
+        
+        console.log('Admin autenticado correctamente:', profile);
+      } catch (error) {
+        console.error('Token inválido o expirado. Redirigiendo al login de admin.', error);
+        authService.logout(); // Limpiar token inválido
+        navigate('/login-admin');
+      }
+    };
+
+    verificarAutenticacion();
+  }, [navigate]);
+
+  // Cargar formularios desde el service al montar
+  const cargarFormularios = async () => {
     setLoading(true);
     setError(null);
-    encuestaService.getEncuestas()
-      .then((data) => {
-        setFormularios(
-          data.map((e) => ({
-            id: Number(e.id),
-            titulo: e.titulo,
-            preguntas: [], // TODO: Mapear preguntas si el backend las entrega
-            asignatura: e.id_asignatura,
-            enviado: false,
-            editandoTitulo: false,
-          }))
-        );
-      })
-      .catch(() => setError('Error al cargar los formularios'))
-      .finally(() => setLoading(false));
+    try {
+      const data = await encuestaService.getEncuestas();
+      setFormularios(
+        data.map((e) => ({
+          id: e.id,
+          titulo: e.titulo,
+          preguntas: e.preguntas?.map((p) => ({
+            id: p.id || `pregunta_${Math.random()}`,
+            texto: p.texto,
+            respuestas: p.respuestas,
+            editando: false,
+            respuestaCorrecta: p.respuestaCorrecta,
+          })) || [],
+          asignatura: e.id_asignatura,
+          fechaLimite: e.fecha_termino,
+          descripcion: e.descripcion,
+          enviado: e.enviado || false,
+          publicado: e.publicado || false,
+          editandoTitulo: false,
+        }))
+      );
+    } catch (err) {
+      setError('Error al cargar los formularios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar estadísticas de usuarios
+  const cargarEstadisticas = async () => {
+    try {
+      const data = await usuarioService.getEstadisticas();
+      setEstadisticas(data);
+    } catch (err) {
+      console.error('Error al cargar estadísticas:', err);
+    }
+  };
+
+  useEffect(() => {
+    cargarFormularios();
+    cargarEstadisticas();
+    
+    // Actualizar estadísticas cada 60 segundos
+    const intervalId = setInterval(() => {
+      cargarEstadisticas();
+    }, 60000);
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleLogout = () => {
-    navigate('/');
+    console.log('Cerrando sesión de admin');
+    authService.logout();
+    navigate('/login-admin');
   };
 
   // Guardar formulario (nuevo o editado)
@@ -79,32 +142,54 @@ export const AdminPanel: React.FC = () => {
     try {
       let nuevoFormulario = formulario;
       if (formulario.id && formularios.some(f => f.id === formulario.id)) {
-        // Actualizar
-        await encuestaService.updateEncuesta(formulario.id.toString(), {
+        // Actualizar encuesta existente
+        const preguntasParaBackend = formulario.preguntas
+          .filter(p => !p.editando && p.texto.trim() && p.respuestaCorrecta !== undefined)
+          .map(p => ({
+            texto: p.texto,
+            respuestas: p.respuestas,
+            respuestaCorrecta: p.respuestaCorrecta!,
+          }));
+
+        await encuestaService.updateEncuesta(formulario.id, {
           titulo: formulario.titulo,
-          // ...otros campos que correspondan
+          descripcion: formulario.descripcion || '',
+          id_asignatura: formulario.asignatura || '',
+          fecha_termino: formulario.fechaLimite || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          preguntas: preguntasParaBackend,
         });
+        
         setFormularios((prev) =>
           prev.map((f) => (f.id === formulario.id ? { ...formulario } : f))
         );
       } else {
-        // Crear
+        // Crear nueva encuesta
+        const preguntasParaBackend = formulario.preguntas
+          .filter(p => !p.editando && p.texto.trim() && p.respuestaCorrecta !== undefined)
+          .map(p => ({
+            texto: p.texto,
+            respuestas: p.respuestas,
+            respuestaCorrecta: p.respuestaCorrecta!,
+          }));
+
         const creado = await encuestaService.createEncuesta({
           titulo: formulario.titulo,
-          descripcion: '', // TODO: Ajustar según tu modelo
+          descripcion: formulario.descripcion || '',
           id_asignatura: formulario.asignatura || '',
-          fecha_creacion: new Date().toISOString(),
-          fecha_termino: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          fecha_termino: formulario.fechaLimite || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          preguntas: preguntasParaBackend,
         });
+        
         nuevoFormulario = {
           ...formulario,
-          id: Number(creado.id),
+          id: creado.id,
           asignatura: creado.id_asignatura,
         };
         setFormularios((prev) => [...prev, nuevoFormulario]);
       }
       setFormularioSeleccionado(null);
     } catch (e) {
+      console.error('Error al guardar formulario:', e);
       setError('Error al guardar el formulario');
     }
   };
@@ -167,6 +252,8 @@ export const AdminPanel: React.FC = () => {
           formularios={formularios}
           setFormularios={setFormularios}
           setFormularioSoloLectura={setFormularioSoloLectura}
+          onRecargarFormularios={cargarFormularios}
+          onGuardarFormulario={handleGuardarFormulario}
         />
       );
     }
@@ -176,12 +263,12 @@ export const AdminPanel: React.FC = () => {
       case 'Inicio':
         return <PanelInicio usuario={{
           id: "admin1",
-          nombres: "eric ross",
+          nombres: "Administrador",
           apellidos: "General",
           tipo: "admin",
-          total_usuarios: 120,
-          total_docentes: 15,
-          total_alumnos: 105,
+          total_usuarios: estadisticas.total_usuarios,
+          total_docentes: estadisticas.total_docentes,
+          total_alumnos: estadisticas.total_alumnos,
         }} />;
       case 'Perfil':
         return (
@@ -204,6 +291,8 @@ export const AdminPanel: React.FC = () => {
         return <DesignarAsignaturaDocente />;
       case 'Crear Usuario':
         return <CrearUsuario />;
+      case 'Carga Masiva':
+        return <CargaMasivaUsuarios />;
       case 'Cerrar Sesión':
         return <p>Has cerrado sesión</p>;
       default:
@@ -242,6 +331,9 @@ export const AdminPanel: React.FC = () => {
           </li>
           <li onClick={() => setActiveSection('Crear Usuario')}>
             <PersonAddIcon className="menu-icon" /> Crear Usuario
+          </li>
+          <li onClick={() => setActiveSection('Carga Masiva')}>
+            <UploadFileIcon className="menu-icon" /> Carga Masiva
           </li>
           <li className="logout" onClick={handleLogout}>
             <LogoutIcon className="menu-icon" /> Cerrar Sesión

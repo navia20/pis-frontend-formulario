@@ -10,13 +10,13 @@ interface PreguntaEditorProps {
   pregunta: Pregunta;
   soloLectura: boolean;
   error: string;
-  actualizarPregunta: (id: number, texto: string) => void;
-  actualizarRespuesta: (id: number, index: number, texto: string) => void;
-  seleccionarRespuestaCorrecta: (id: number, index: number) => void;
-  agregarAlternativa: (id: number) => void;
-  guardarPregunta: (id: number) => void;
-  editarPregunta: (id: number) => void;
-  eliminarPregunta: (id: number) => void;
+  actualizarPregunta: (id: string, texto: string) => void;
+  actualizarRespuesta: (id: string, index: number, texto: string) => void;
+  seleccionarRespuestaCorrecta: (id: string, index: number) => void;
+  agregarAlternativa: (id: string) => void;
+  guardarPregunta: (id: string) => void;
+  editarPregunta: (id: string) => void;
+  eliminarPregunta: (id: string) => void;
 }
 
 export const PreguntaEditor: React.FC<PreguntaEditorProps> = ({

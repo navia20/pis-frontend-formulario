@@ -20,23 +20,25 @@ export const FormularioMenu: React.FC<FormularioMenuProps> = ({
   puedeEnviar,
 }) => (
   <div className="admin-formulario-menu">
-    <button onClick={onEditar} disabled={formulario.enviado}>Editar</button>
-    <button onClick={onEliminar}>Eliminar</button>
+    <button onClick={onEditar} disabled={formulario.publicado}>
+      Editar
+    </button>
+    <button onClick={onEliminar} disabled={formulario.publicado}>
+      Eliminar
+    </button>
     {formulario.asignatura && (
       <button
         onClick={onEnviar}
-        disabled={formulario.enviado || !puedeEnviar}
+        disabled={!puedeEnviar && !formulario.publicado}
         title={
-          !puedeEnviar
+          !puedeEnviar && !formulario.publicado
             ? 'Debes guardar el título, asignatura, fecha límite y todas las preguntas antes de enviar'
             : undefined
         }
       >
-        Enviar a Asignatura
+        {formulario.publicado ? '❌ Despublicar' : '📢 Publicar'}
       </button>
     )}
-    {formulario.enviado && (
-      <button onClick={onVer}>Ver Formulario</button>
-    )}
+    <button onClick={onVer}>Ver Formulario</button>
   </div>
 );

@@ -102,6 +102,16 @@
   box-shadow: 0 6px 12px rgba(44, 53, 80, 0.18);
 }
 
+.alumno-formulario-btn-enviar.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.alumno-formulario-btn-enviar:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
 .alumno-formulario-mensaje-enviado {
   margin-top: 20px;
   text-align: center;
@@ -111,6 +121,15 @@
   border: 1px solid #2ecc71;
   padding: 10px;
   border-radius: 6px;
+}
+
+.pregunta-no-respondida {
+  background-color: #ffeeee;
+  color: #e74c3c;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 10px;
 }
 
 @media (max-width: 700px) {

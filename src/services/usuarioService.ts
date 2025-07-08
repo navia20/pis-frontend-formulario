@@ -1,10 +1,10 @@
 // Servicio para gestionar usuarios (alumnos y docentes).
-// Usa mocks para desarrollo y deja comentadas las llamadas reales al backend.
+// Conectado al backend NestJS
 
-//import axios from 'axios';
-//const API_URL = 'http://localhost:3000'; // Cambia según tu backend
+import axios from 'axios';
+const API_URL = 'http://localhost:3000'; // URL del backend
 
-// --- MOCK DATA ---
+// --- MOCK DATA (para referencia) ---
 const mockUsuarios = [
   {
     id: 'alumno1',
@@ -34,17 +34,52 @@ const mockUsuarios = [
 export const usuarioService = {
   // Obtener todos los usuarios (alumnos y docentes)
   getUsuarios: async () => {
-    // return (await axios.get(`${API_URL}/usuarios`)).data; // <-- Llamada real (ajusta la ruta según tu backend)
-    return Promise.resolve(mockUsuarios); // <-- Mock temporal
+    try {
+      const [alumnos, docentes] = await Promise.all([
+        axios.get(`${API_URL}/alumnos`),
+        axios.get(`${API_URL}/docentes`)
+      ]);
+      return [...alumnos.data, ...docentes.data];
+    } catch (error) {
+      console.error('Error obteniendo usuarios:', error);
+      return Promise.resolve(mockUsuarios); // Fallback a mock en caso de error
+    }
   },
 
   // Crear un nuevo usuario (alumno o docente)
   crearUsuario: async (usuario: any) => {
-    // return (await axios.post(`${API_URL}/alumnos`, usuario)).data; // <-- Llamada real para alumno
-    // return (await axios.post(`${API_URL}/docentes`, usuario)).data; // <-- Llamada real para docente
-    const nuevo = { ...usuario, id: (Math.random() * 10000).toFixed(0), activo: true };
-    mockUsuarios.push(nuevo);
-    return Promise.resolve(nuevo); // <-- Mock temporal
+    try {
+      if (usuario.tipo === 'alumno') {
+        // Crear alumno usando el endpoint de auth/register
+        const alumnoData = {
+          nombres: usuario.nombres,
+          apellidos: usuario.apellidos,
+          rut: usuario.rut,
+          email: usuario.email,
+          contraseña: usuario.contraseña,
+          id_carrera: usuario.id_carrera,
+          año_ingreso: parseInt(usuario.año_ingreso),
+          tipo: 'alumno'
+        };
+        const response = await axios.post(`${API_URL}/auth/register`, alumnoData);
+        return response.data;
+      } else if (usuario.tipo === 'docente') {
+        // Crear docente usando el endpoint de auth/register
+        const docenteData = {
+          nombres: usuario.nombres,
+          apellidos: usuario.apellidos,
+          rut: usuario.rut,
+          email: usuario.email,
+          contraseña: usuario.contraseña,
+          tipo: 'docente'
+        };
+        const response = await axios.post(`${API_URL}/auth/register`, docenteData);
+        return response.data;
+      }
+    } catch (error) {
+      console.error('Error creando usuario:', error);
+      throw error; // Propagar el error para manejo en el componente
+    }
   },
 
   // Editar usuario
@@ -68,5 +103,22 @@ export const usuarioService = {
       return Promise.resolve({ deleted: true });
     }
     return Promise.resolve({ deleted: false });
+  },
+
+  // Obtener estadísticas de usuarios (total, alumnos, docentes)
+  getEstadisticas: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/admin/estadisticas`);
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo estadísticas:', error);
+      // Fallback a datos mock en caso de error
+      return {
+        total_usuarios: 120,
+        total_alumnos: 105,
+        total_docentes: 15,
+        total_admins: 3
+      };
+    }
   },
 };

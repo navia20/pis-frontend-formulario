@@ -5,6 +5,7 @@ export interface Pregunta {
 }
 export interface FormularioDocente {
   id: number;
+  idOriginal?: string; // ID original de la encuesta en el backend
   titulo: string;
   preguntas: Pregunta[];
   asignatura?: string;

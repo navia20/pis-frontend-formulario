@@ -119,3 +119,24 @@
 .btn-retroceder:hover {
   background-color: #2980b9;
 }
+
+/* Estilos para mensajes de error */
+.error-message {
+  background-color: #fdecea;
+  color: #c0392b;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Estilos para pantalla de carga */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 18px;
+  color: #666;
+}

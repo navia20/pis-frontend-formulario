@@ -6,8 +6,8 @@ import './FormularioCard.css';
 
 interface FormularioCardProps {
   formulario: Formulario;
-  menuAbierto: number | null;
-  setMenuAbierto: (id: number | null) => void;
+  menuAbierto: string | null;
+  setMenuAbierto: (id: string | null) => void;
   onEditar: () => void;
   onEliminar: () => void;
   onEnviar: () => void;
@@ -42,7 +42,7 @@ export const FormularioCard: React.FC<FormularioCardProps> = ({
       aria-label="Opciones"
       onClick={e => {
         e.stopPropagation();
-        setMenuAbierto(menuAbierto === formulario.id ? null : formulario.id);
+        setMenuAbierto(menuAbierto === formulario.id ? null : formulario.id || null);
       }}
     >
       <MoreVertIcon />
@@ -57,8 +57,14 @@ export const FormularioCard: React.FC<FormularioCardProps> = ({
         puedeEnviar={puedeEnviar}
       />
     )}
-    {formulario.enviado && (
-      <div className="admin-formulario-enviado">Enviado</div>
-    )}
+    <div className="admin-formulario-estado">
+      {formulario.publicado ? (
+        <div className="admin-formulario-publicado">📢 Publicado</div>
+      ) : formulario.enviado ? (
+        <div className="admin-formulario-enviado">✅ Guardado</div>
+      ) : (
+        <div className="admin-formulario-borrador">📝 Borrador</div>
+      )}
+    </div>
   </div>
 );

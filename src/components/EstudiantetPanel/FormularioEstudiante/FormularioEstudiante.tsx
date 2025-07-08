@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './FormularioEstudiante.css';
 
 interface Pregunta {
@@ -24,8 +24,20 @@ export const FormularioEstudiante: React.FC<FormularioEstudianteProps> = ({
   onEnviar
 }) => {
   const [mensajeEnviado, setMensajeEnviado] = useState(false);
+  const [todasRespondidas, setTodasRespondidas] = useState(false);
+  
+  // Verificar si todas las preguntas tienen respuesta
+  useEffect(() => {
+    const preguntasRespondidas = Object.keys(respuestasSeleccionadas).length;
+    const totalPreguntas = formulario.preguntas.length;
+    console.log(`Preguntas respondidas: ${preguntasRespondidas}/${totalPreguntas}`);
+    
+    setTodasRespondidas(preguntasRespondidas === totalPreguntas);
+  }, [respuestasSeleccionadas, formulario.preguntas]);
 
   const manejarCambioRespuesta = (idPregunta: number, respuesta: string) => {
+    console.log(`Pregunta ${idPregunta} - Respuesta seleccionada: "${respuesta}"`);
+    
     setRespuestasSeleccionadas({
       ...respuestasSeleccionadas,
       [idPregunta]: respuesta,
@@ -33,6 +45,11 @@ export const FormularioEstudiante: React.FC<FormularioEstudianteProps> = ({
   };
 
   const manejarEnvioFormulario = () => {
+    if (!todasRespondidas) {
+      alert("Debes responder todas las preguntas antes de enviar el formulario.");
+      return;
+    }
+    
     if (window.confirm("¿Estás seguro que quieres enviar tus respuestas? Una vez enviado no podrás modificarlo.")) {
       setMensajeEnviado(true);
       onEnviar();
@@ -47,6 +64,9 @@ export const FormularioEstudiante: React.FC<FormularioEstudianteProps> = ({
           <div key={pregunta.id} className="alumno-formulario-pregunta">
             <div className="alumno-formulario-pregunta-header">
               <h3>Pregunta {pregunta.id}</h3>
+              {!respuestasSeleccionadas[pregunta.id] && (
+                <span className="pregunta-no-respondida">Sin responder</span>
+              )}
             </div>
             <p className="alumno-formulario-pregunta-texto">{pregunta.texto}</p>
             <div className="alumno-formulario-respuestas">
@@ -71,8 +91,12 @@ export const FormularioEstudiante: React.FC<FormularioEstudianteProps> = ({
           </div>
         ))}
       </div>
-      <button className="alumno-formulario-btn-enviar" onClick={manejarEnvioFormulario}>
-        Enviar
+      <button 
+        className={`alumno-formulario-btn-enviar ${!todasRespondidas ? 'disabled' : ''}`} 
+        onClick={manejarEnvioFormulario}
+        disabled={!todasRespondidas}
+      >
+        {todasRespondidas ? 'Enviar' : 'Responde todas las preguntas para enviar'}
       </button>
       {mensajeEnviado && <p className="alumno-formulario-mensaje-enviado">Formulario enviado con éxito</p>}
     </div>

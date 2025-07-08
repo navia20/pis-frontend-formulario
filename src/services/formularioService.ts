@@ -7,11 +7,11 @@ import { Formulario } from '../types/formulario';
 // --- MOCK DATA ---
 const mockFormularios: Formulario[] = [
   {
-    id: 1,
+    id: 'form_1',
     titulo: 'Encuesta de Matemáticas',
     preguntas: [
-      { id: 1, texto: '¿Te gustó la clase?', respuestas: ['Sí', 'No'], editando: false },
-      { id: 2, texto: '¿Recomendarías la asignatura?', respuestas: ['Sí', 'No'], editando: false },
+      { id: 'pregunta_1', texto: '¿Te gustó la clase?', respuestas: ['Sí', 'No'], editando: false },
+      { id: 'pregunta_2', texto: '¿Recomendarías la asignatura?', respuestas: ['Sí', 'No'], editando: false },
     ],
     asignatura: 'Matemáticas',
     fechaLimite: '2025-06-30',
@@ -32,13 +32,13 @@ export const formularioService = {
   // Crear un nuevo formulario
   crearFormulario: async (formulario: Omit<Formulario, 'id'>): Promise<Formulario> => {
     // return (await axios.post(API_URL, formulario)).data;
-    const nuevo: Formulario = { ...formulario, id: Math.floor(Math.random() * 10000) };
+    const nuevo: Formulario = { ...formulario, id: `form_${Date.now()}_${Math.floor(Math.random() * 1000)}` };
     mockFormularios.push(nuevo);
     return Promise.resolve(nuevo);
   },
 
   // Editar un formulario existente
-  editarFormulario: async (id: number, update: Partial<Formulario>): Promise<Formulario | undefined> => {
+  editarFormulario: async (id: string, update: Partial<Formulario>): Promise<Formulario | undefined> => {
     // return (await axios.patch(`${API_URL}/${id}`, update)).data;
     const idx = mockFormularios.findIndex(f => f.id === id);
     if (idx !== -1) {
@@ -49,7 +49,7 @@ export const formularioService = {
   },
 
   // Eliminar un formulario
-  eliminarFormulario: async (id: number): Promise<{ deleted: boolean }> => {
+  eliminarFormulario: async (id: string): Promise<{ deleted: boolean }> => {
     // return (await axios.delete(`${API_URL}/${id}`)).data;
     const idx = mockFormularios.findIndex(f => f.id === id);
     if (idx !== -1) {
